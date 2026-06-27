@@ -14,4 +14,6 @@ export interface ChoreUpdate {
   /** @minimum 0 */
   dollarValue?: number;
   frequency?: ChoreUpdateFrequency;
+  /** @nullable */
+  scheduledDays?: number[] | null;
 }

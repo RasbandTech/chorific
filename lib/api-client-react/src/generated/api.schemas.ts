@@ -42,6 +42,11 @@ export interface Chore {
   icon: string;
   dollarValue: number;
   frequency: ChoreFrequency;
+  /**
+     * Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.
+     * @nullable
+     */
+  scheduledDays?: number[] | null;
   assignedMemberIds?: number[];
   createdAt: string;
 }
@@ -61,6 +66,8 @@ export interface ChoreInput {
   /** @minimum 0 */
   dollarValue: number;
   frequency: ChoreInputFrequency;
+  /** @nullable */
+  scheduledDays?: number[] | null;
 }
 
 export type ChoreUpdateFrequency = typeof ChoreUpdateFrequency[keyof typeof ChoreUpdateFrequency];
@@ -78,6 +85,8 @@ export interface ChoreUpdate {
   /** @minimum 0 */
   dollarValue?: number;
   frequency?: ChoreUpdateFrequency;
+  /** @nullable */
+  scheduledDays?: number[] | null;
 }
 
 export interface Assignment {

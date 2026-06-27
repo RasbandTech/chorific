@@ -14,4 +14,6 @@ export interface ChoreInput {
   /** @minimum 0 */
   dollarValue: number;
   frequency: ChoreInputFrequency;
+  /** @nullable */
+  scheduledDays?: number[] | null;
 }

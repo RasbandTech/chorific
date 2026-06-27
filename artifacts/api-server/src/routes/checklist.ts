@@ -11,6 +11,19 @@ function todayRange() {
   return { start, end };
 }
 
+function parseScheduledDays(raw: string | null | undefined): number[] | null {
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function choreAppearsToday(chore: typeof choresTable.$inferSelect): boolean {
+  if (chore.frequency === "daily") return true;
+  const scheduledDays = parseScheduledDays(chore.scheduledDays);
+  if (!scheduledDays || scheduledDays.length === 0) return true;
+  const todayDow = new Date().getDay();
+  return scheduledDays.includes(todayDow);
+}
+
 router.get("/checklist", async (req, res) => {
   try {
     const { start, end } = todayRange();
@@ -22,13 +35,15 @@ router.get("/checklist", async (req, res) => {
 
     const result = members.map(member => {
       const memberAssignments = allAssignments.filter(a => a.memberId === member.id);
-      const assignedChores = chores.filter(c => memberAssignments.some(a => a.choreId === c.id));
-      const allChoresAssignments = allAssignments;
+      const assignedChores = chores.filter(c =>
+        memberAssignments.some(a => a.choreId === c.id) && choreAppearsToday(c)
+      );
+
       const choreItems = assignedChores.map(chore => {
         const completion = todayCompletions.find(
           c => c.choreId === chore.id && c.memberId === member.id
         );
-        const choreAssignments = allChoresAssignments.filter(a => a.choreId === chore.id);
+        const choreAssignments = allAssignments.filter(a => a.choreId === chore.id);
         return {
           chore: {
             id: chore.id,
@@ -36,6 +51,7 @@ router.get("/checklist", async (req, res) => {
             icon: chore.icon,
             dollarValue: parseFloat(chore.dollarValue),
             frequency: chore.frequency,
+            scheduledDays: parseScheduledDays(chore.scheduledDays),
             assignedMemberIds: choreAssignments.map(a => a.memberId),
             createdAt: chore.createdAt.toISOString(),
           },
@@ -43,6 +59,7 @@ router.get("/checklist", async (req, res) => {
           completedAt: completion ? completion.completedAt.toISOString() : null,
         };
       });
+
       return {
         member: {
           id: member.id,

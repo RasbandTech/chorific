@@ -417,6 +417,11 @@ components:
         frequency:
           type: string
           enum: [daily, weekly]
+        scheduledDays:
+          type: ["array", "null"]
+          items:
+            type: integer
+          description: "Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores."
         assignedMemberIds:
           type: array
           items:
@@ -439,6 +444,10 @@ components:
         frequency:
           type: string
           enum: [daily, weekly]
+        scheduledDays:
+          type: ["array", "null"]
+          items:
+            type: integer
 
     ChoreUpdate:
       type: object
@@ -454,6 +463,10 @@ components:
         frequency:
           type: string
           enum: [daily, weekly]
+        scheduledDays:
+          type: ["array", "null"]
+          items:
+            type: integer
 
     Assignment:
       type: object

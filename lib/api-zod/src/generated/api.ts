@@ -89,6 +89,7 @@ export const GetChoresResponseItem = zod.object({
   "icon": zod.string(),
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
+  "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })
@@ -107,7 +108,8 @@ export const CreateChoreBody = zod.object({
   "name": zod.string().min(1),
   "icon": zod.string(),
   "dollarValue": zod.number().min(createChoreBodyDollarValueMin),
-  "frequency": zod.enum(['daily', 'weekly'])
+  "frequency": zod.enum(['daily', 'weekly']),
+  "scheduledDays": zod.array(zod.number()).nullish()
 })
 
 export const CreateChoreResponse = zod.object({
@@ -116,6 +118,7 @@ export const CreateChoreResponse = zod.object({
   "icon": zod.string(),
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
+  "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })
@@ -137,7 +140,8 @@ export const UpdateChoreBody = zod.object({
   "name": zod.string().min(1).optional(),
   "icon": zod.string().optional(),
   "dollarValue": zod.number().min(updateChoreBodyDollarValueMin).optional(),
-  "frequency": zod.enum(['daily', 'weekly']).optional()
+  "frequency": zod.enum(['daily', 'weekly']).optional(),
+  "scheduledDays": zod.array(zod.number()).nullish()
 })
 
 export const UpdateChoreResponse = zod.object({
@@ -146,6 +150,7 @@ export const UpdateChoreResponse = zod.object({
   "icon": zod.string(),
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
+  "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })
@@ -207,6 +212,7 @@ export const GetChecklistResponseItem = zod.object({
   "icon": zod.string(),
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
+  "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 }),

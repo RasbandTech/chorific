@@ -8,11 +8,14 @@ import {
   useCreateChore,
   useUpdateChore,
   useDeleteChore,
+  useAssignChore,
+  useUnassignChore,
   getGetMembersQueryKey,
-  getGetChoresQueryKey
+  getGetChoresQueryKey,
+  getGetChecklistQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { 
@@ -64,11 +67,22 @@ const memberSchema = z.object({
   avatarColor: z.string().min(1, "Color is required"),
 });
 
+const DAYS_OF_WEEK = [
+  { label: "Sun", value: 0 },
+  { label: "Mon", value: 1 },
+  { label: "Tue", value: 2 },
+  { label: "Wed", value: 3 },
+  { label: "Thu", value: 4 },
+  { label: "Fri", value: 5 },
+  { label: "Sat", value: 6 },
+];
+
 const choreSchema = z.object({
   name: z.string().min(1, "Name is required"),
   icon: z.string().min(1, "Icon is required"),
   dollarValue: z.coerce.number().min(0, "Must be at least 0"),
   frequency: z.enum(["daily", "weekly"]),
+  scheduledDays: z.array(z.number()).optional(),
   assignedMemberIds: z.array(z.number()),
 });
 
@@ -91,6 +105,8 @@ export default function Manage() {
   const createChore = useCreateChore();
   const updateChore = useUpdateChore();
   const deleteChore = useDeleteChore();
+  const assignChore = useAssignChore();
+  const unassignChore = useUnassignChore();
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -108,8 +124,10 @@ export default function Manage() {
 
   const choreForm = useForm<ChoreFormValues>({
     resolver: zodResolver(choreSchema),
-    defaultValues: { name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", assignedMemberIds: [] }
+    defaultValues: { name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], assignedMemberIds: [] }
   });
+
+  const watchedFrequency = useWatch({ control: choreForm.control, name: "frequency" });
 
   const onOpenMemberNew = () => {
     setEditingMemberId(null);
@@ -154,7 +172,7 @@ export default function Manage() {
 
   const onOpenChoreNew = () => {
     setEditingChoreId(null);
-    choreForm.reset({ name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", assignedMemberIds: [] });
+    choreForm.reset({ name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], assignedMemberIds: [] });
     setChoreDialogOpen(true);
   };
 
@@ -164,25 +182,49 @@ export default function Manage() {
       name: chore.name, 
       icon: chore.icon, 
       dollarValue: chore.dollarValue, 
-      frequency: chore.frequency, 
+      frequency: chore.frequency,
+      scheduledDays: chore.scheduledDays || [],
       assignedMemberIds: chore.assignedMemberIds || [] 
     });
     setChoreDialogOpen(true);
   };
 
+  const syncAssignments = async (choreId: number, newMemberIds: number[], oldMemberIds: number[]) => {
+    const toAdd = newMemberIds.filter(id => !oldMemberIds.includes(id));
+    const toRemove = oldMemberIds.filter(id => !newMemberIds.includes(id));
+    await Promise.all([
+      ...toAdd.map(memberId => assignChore.mutateAsync({ id: choreId, data: { memberId } })),
+      ...toRemove.map(memberId => unassignChore.mutateAsync({ id: choreId, memberId })),
+    ]);
+  };
+
   const onChoreSubmit = (data: ChoreFormValues) => {
+    const { assignedMemberIds, scheduledDays, ...choreData } = data;
+    const payload = {
+      ...choreData,
+      scheduledDays: data.frequency === "weekly" && scheduledDays && scheduledDays.length > 0
+        ? scheduledDays
+        : null,
+    };
+
     if (editingChoreId) {
-      updateChore.mutate({ id: editingChoreId, data }, {
-        onSuccess: () => {
+      const currentChore = chores?.find(c => c.id === editingChoreId);
+      const oldIds = currentChore?.assignedMemberIds || [];
+      updateChore.mutate({ id: editingChoreId, data: payload }, {
+        onSuccess: async () => {
+          await syncAssignments(editingChoreId, assignedMemberIds, oldIds);
           queryClient.invalidateQueries({ queryKey: getGetChoresQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetChecklistQueryKey() });
           setChoreDialogOpen(false);
           toast({ title: "Chore updated" });
         }
       });
     } else {
-      createChore.mutate({ data }, {
-        onSuccess: () => {
+      createChore.mutate({ data: payload }, {
+        onSuccess: async (newChore) => {
+          await syncAssignments(newChore.id, assignedMemberIds, []);
           queryClient.invalidateQueries({ queryKey: getGetChoresQueryKey() });
+          queryClient.invalidateQueries({ queryKey: getGetChecklistQueryKey() });
           setChoreDialogOpen(false);
           toast({ title: "Chore added" });
         }
@@ -473,7 +515,10 @@ export default function Manage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Frequency</FormLabel>
-                      <Select value={field.value} onValueChange={field.onChange}>
+                      <Select value={field.value} onValueChange={(val) => {
+                        field.onChange(val);
+                        if (val === "daily") choreForm.setValue("scheduledDays", []);
+                      }}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue />
@@ -489,6 +534,46 @@ export default function Manage() {
                   )}
                 />
               </div>
+
+              {watchedFrequency === "weekly" && (
+                <FormField
+                  control={choreForm.control}
+                  name="scheduledDays"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Which day(s)?</FormLabel>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {DAYS_OF_WEEK.map(day => {
+                          const selected = (field.value || []).includes(day.value);
+                          return (
+                            <button
+                              key={day.value}
+                              type="button"
+                              onClick={() => {
+                                const current = field.value || [];
+                                field.onChange(
+                                  selected
+                                    ? current.filter(d => d !== day.value)
+                                    : [...current, day.value]
+                                );
+                              }}
+                              className={`w-11 h-11 rounded-full text-sm font-semibold border transition-colors ${
+                                selected
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
+                              }`}
+                            >
+                              {day.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">Leave blank to show every week day.</p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <FormField
                 control={choreForm.control}
