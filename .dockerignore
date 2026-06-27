@@ -1,0 +1,28 @@
+# Dependencies (rebuilt inside Docker)
+node_modules/
+**/node_modules/
+
+# Build outputs (rebuilt inside Docker)
+**/dist/
+**/.turbo/
+
+# Development / editor files
+.git/
+.gitignore
+*.md
+.env
+.env.*
+!.env.example
+*.log
+
+# Replit / IDE config
+.replit
+.local/
+.upm/
+replit.nix
+attached_assets/
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
