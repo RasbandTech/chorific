@@ -20,8 +20,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.api
-    image: chorific-api
-    pull_policy: never
     restart: unless-stopped
     environment:
       PORT: 3000
@@ -37,8 +35,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.web
-    image: chorific-web
-    pull_policy: never
     restart: unless-stopped
     ports:
       - "8080:80"
