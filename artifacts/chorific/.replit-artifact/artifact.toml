@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Chorific"
+version = "1.0.0"
+id = "artifacts/chorific"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22702
+
+[services.development]
+run = "pnpm --filter @workspace/chorific run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/chorific", "run", "build" ]
+publicDir = "artifacts/chorific/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22702"
+BASE_PATH = "/"

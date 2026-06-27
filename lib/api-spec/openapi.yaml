@@ -1,22 +1,30 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Chorific API - Household chore chart and allowance tracker
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: members
+    description: Household member operations
+  - name: chores
+    description: Chore management
+  - name: checklist
+    description: Daily chore checklist
+  - name: history
+    description: Completion history
+  - name: balances
+    description: Balance and payout operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +32,334 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /members:
+    get:
+      operationId: getMembers
+      tags: [members]
+      summary: List all household members
+      responses:
+        "200":
+          description: List of members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Member"
+    post:
+      operationId: createMember
+      tags: [members]
+      summary: Create a new household member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberInput"
+      responses:
+        "201":
+          description: Created member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+
+  /members/{id}:
+    patch:
+      operationId: updateMember
+      tags: [members]
+      summary: Update a household member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MemberUpdate"
+      responses:
+        "200":
+          description: Updated member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Member"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteMember
+      tags: [members]
+      summary: Delete a household member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /chores:
+    get:
+      operationId: getChores
+      tags: [chores]
+      summary: List all chores
+      responses:
+        "200":
+          description: List of chores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chore"
+    post:
+      operationId: createChore
+      tags: [chores]
+      summary: Create a new chore
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChoreInput"
+      responses:
+        "201":
+          description: Created chore
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chore"
+
+  /chores/{id}:
+    patch:
+      operationId: updateChore
+      tags: [chores]
+      summary: Update a chore
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChoreUpdate"
+      responses:
+        "200":
+          description: Updated chore
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chore"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteChore
+      tags: [chores]
+      summary: Delete a chore
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /chores/{id}/assign:
+    post:
+      operationId: assignChore
+      tags: [chores]
+      summary: Assign a chore to a member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignmentInput"
+      responses:
+        "201":
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Assignment"
+
+  /chores/{id}/assign/{memberId}:
+    delete:
+      operationId: unassignChore
+      tags: [chores]
+      summary: Remove a chore assignment from a member
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: memberId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Unassigned
+
+  /checklist:
+    get:
+      operationId: getChecklist
+      tags: [checklist]
+      summary: Get today's checklist for all members (swim lane data)
+      responses:
+        "200":
+          description: Checklist per member
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemberChecklist"
+
+  /completions:
+    post:
+      operationId: completeChore
+      tags: [checklist]
+      summary: Mark a chore as completed for a member
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompletionInput"
+      responses:
+        "201":
+          description: Completion recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Completion"
+
+  /completions/{id}:
+    delete:
+      operationId: uncompleteChore
+      tags: [checklist]
+      summary: Undo a chore completion (uncheck)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Completion removed
+
+  /history:
+    get:
+      operationId: getHistory
+      tags: [history]
+      summary: Get completion history with optional member filter
+      parameters:
+        - name: memberId
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: ["integer", "null"]
+      responses:
+        "200":
+          description: History entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryResponse"
+
+  /balances:
+    get:
+      operationId: getBalances
+      tags: [balances]
+      summary: Get current cash balances for all members
+      responses:
+        "200":
+          description: Balance per member
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemberBalance"
+
+  /payouts:
+    get:
+      operationId: getPayouts
+      tags: [balances]
+      summary: Get payout history
+      responses:
+        "200":
+          description: Payout history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payout"
+    post:
+      operationId: createPayout
+      tags: [balances]
+      summary: Record a payout for a member (clears their balance)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PayoutInput"
+      responses:
+        "201":
+          description: Payout recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payout"
+
+  /summary:
+    get:
+      operationId: getSummary
+      tags: [balances]
+      summary: Get household summary stats (total earned, completed chores, top earner)
+      responses:
+        "200":
+          description: Summary stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HouseholdSummary"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +370,240 @@ components:
       required:
         - status
 
+    Member:
+      type: object
+      required: [id, name, avatarColor, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        avatarColor:
+          type: string
+        createdAt:
+          type: string
+
+    MemberInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        avatarColor:
+          type: string
+
+    MemberUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        avatarColor:
+          type: string
+
+    Chore:
+      type: object
+      required: [id, name, icon, dollarValue, frequency, createdAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        icon:
+          type: string
+        dollarValue:
+          type: number
+        frequency:
+          type: string
+          enum: [daily, weekly]
+        assignedMemberIds:
+          type: array
+          items:
+            type: integer
+        createdAt:
+          type: string
+
+    ChoreInput:
+      type: object
+      required: [name, icon, dollarValue, frequency]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+        dollarValue:
+          type: number
+          minimum: 0
+        frequency:
+          type: string
+          enum: [daily, weekly]
+
+    ChoreUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        icon:
+          type: string
+        dollarValue:
+          type: number
+          minimum: 0
+        frequency:
+          type: string
+          enum: [daily, weekly]
+
+    Assignment:
+      type: object
+      required: [id, choreId, memberId]
+      properties:
+        id:
+          type: integer
+        choreId:
+          type: integer
+        memberId:
+          type: integer
+
+    AssignmentInput:
+      type: object
+      required: [memberId]
+      properties:
+        memberId:
+          type: integer
+
+    MemberChecklist:
+      type: object
+      required: [member, chores]
+      properties:
+        member:
+          $ref: "#/components/schemas/Member"
+        chores:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChecklistItem"
+
+    ChecklistItem:
+      type: object
+      required: [chore, completionId, completedAt]
+      properties:
+        chore:
+          $ref: "#/components/schemas/Chore"
+        completionId:
+          type: ["integer", "null"]
+        completedAt:
+          type: ["string", "null"]
+
+    Completion:
+      type: object
+      required: [id, choreId, memberId, amountEarned, completedAt]
+      properties:
+        id:
+          type: integer
+        choreId:
+          type: integer
+        memberId:
+          type: integer
+        amountEarned:
+          type: number
+        completedAt:
+          type: string
+
+    CompletionInput:
+      type: object
+      required: [choreId, memberId]
+      properties:
+        choreId:
+          type: integer
+        memberId:
+          type: integer
+
+    HistoryEntry:
+      type: object
+      required: [id, choreId, choreName, choreIcon, memberId, memberName, memberAvatarColor, amountEarned, completedAt]
+      properties:
+        id:
+          type: integer
+        choreId:
+          type: integer
+        choreName:
+          type: string
+        choreIcon:
+          type: string
+        memberId:
+          type: integer
+        memberName:
+          type: string
+        memberAvatarColor:
+          type: string
+        amountEarned:
+          type: number
+        completedAt:
+          type: string
+
+    HistoryResponse:
+      type: object
+      required: [entries, total]
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryEntry"
+        total:
+          type: integer
+
+    MemberBalance:
+      type: object
+      required: [member, balance, totalEarned, totalPaidOut]
+      properties:
+        member:
+          $ref: "#/components/schemas/Member"
+        balance:
+          type: number
+        totalEarned:
+          type: number
+        totalPaidOut:
+          type: number
+
+    Payout:
+      type: object
+      required: [id, memberId, memberName, amount, paidAt]
+      properties:
+        id:
+          type: integer
+        memberId:
+          type: integer
+        memberName:
+          type: string
+        amount:
+          type: number
+        paidAt:
+          type: string
+
+    PayoutInput:
+      type: object
+      required: [memberId, amount]
+      properties:
+        memberId:
+          type: integer
+        amount:
+          type: number
+          minimum: 0
+
+    HouseholdSummary:
+      type: object
+      required: [totalEarnedAllTime, totalChoresCompletedToday, totalChoresCompletedThisWeek, topEarnerName, topEarnerBalance, totalOutstandingBalance]
+      properties:
+        totalEarnedAllTime:
+          type: number
+        totalChoresCompletedToday:
+          type: integer
+        totalChoresCompletedThisWeek:
+          type: integer
+        topEarnerName:
+          type: ["string", "null"]
+        topEarnerBalance:
+          type: ["number", "null"]
+        totalOutstandingBalance:
+          type: number
