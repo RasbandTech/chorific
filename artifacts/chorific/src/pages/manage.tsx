@@ -502,7 +502,7 @@ export default function Manage() {
                     <FormItem>
                       <FormLabel>Reward ($)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.25" min="0" {...field} />
+                        <Input type="number" step="any" min="0" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
