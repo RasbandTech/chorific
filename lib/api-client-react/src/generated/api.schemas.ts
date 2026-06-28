@@ -163,6 +163,42 @@ export interface PayoutInput {
   amount: number;
 }
 
+export interface Settings {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  charityPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  savingsPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  spendingPercent: number;
+}
+
+export interface SettingsInput {
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  charityPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  savingsPercent: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  spendingPercent: number;
+}
+
 export interface HouseholdSummary {
   totalEarnedAllTime: number;
   totalChoresCompletedToday: number;

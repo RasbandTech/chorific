@@ -29,3 +29,5 @@ export * from './memberInput';
 export * from './memberUpdate';
 export * from './payout';
 export * from './payoutInput';
+export * from './settings';
+export * from './settingsInput';

@@ -327,6 +327,65 @@ export const CreatePayoutResponse = zod.object({
 
 
 /**
+ * @summary Get household spending plan settings
+ */
+export const getSettingsResponseCharityPercentMin = 0;
+export const getSettingsResponseCharityPercentMax = 100;
+
+export const getSettingsResponseSavingsPercentMin = 0;
+export const getSettingsResponseSavingsPercentMax = 100;
+
+export const getSettingsResponseSpendingPercentMin = 0;
+export const getSettingsResponseSpendingPercentMax = 100;
+
+
+
+export const GetSettingsResponse = zod.object({
+  "charityPercent": zod.number().min(getSettingsResponseCharityPercentMin).max(getSettingsResponseCharityPercentMax),
+  "savingsPercent": zod.number().min(getSettingsResponseSavingsPercentMin).max(getSettingsResponseSavingsPercentMax),
+  "spendingPercent": zod.number().min(getSettingsResponseSpendingPercentMin).max(getSettingsResponseSpendingPercentMax)
+})
+
+
+/**
+ * @summary Update household spending plan settings
+ */
+export const updateSettingsBodyCharityPercentMin = 0;
+export const updateSettingsBodyCharityPercentMax = 100;
+
+export const updateSettingsBodySavingsPercentMin = 0;
+export const updateSettingsBodySavingsPercentMax = 100;
+
+export const updateSettingsBodySpendingPercentMin = 0;
+export const updateSettingsBodySpendingPercentMax = 100;
+
+
+
+export const UpdateSettingsBody = zod.object({
+  "charityPercent": zod.number().min(updateSettingsBodyCharityPercentMin).max(updateSettingsBodyCharityPercentMax),
+  "savingsPercent": zod.number().min(updateSettingsBodySavingsPercentMin).max(updateSettingsBodySavingsPercentMax),
+  "spendingPercent": zod.number().min(updateSettingsBodySpendingPercentMin).max(updateSettingsBodySpendingPercentMax)
+})
+
+export const updateSettingsResponseCharityPercentMin = 0;
+export const updateSettingsResponseCharityPercentMax = 100;
+
+export const updateSettingsResponseSavingsPercentMin = 0;
+export const updateSettingsResponseSavingsPercentMax = 100;
+
+export const updateSettingsResponseSpendingPercentMin = 0;
+export const updateSettingsResponseSpendingPercentMax = 100;
+
+
+
+export const UpdateSettingsResponse = zod.object({
+  "charityPercent": zod.number().min(updateSettingsResponseCharityPercentMin).max(updateSettingsResponseCharityPercentMax),
+  "savingsPercent": zod.number().min(updateSettingsResponseSavingsPercentMin).max(updateSettingsResponseSavingsPercentMax),
+  "spendingPercent": zod.number().min(updateSettingsResponseSpendingPercentMin).max(updateSettingsResponseSpendingPercentMax)
+})
+
+
+/**
  * @summary Get household summary stats (total earned, completed chores, top earner)
  */
 export const GetSummaryResponse = zod.object({

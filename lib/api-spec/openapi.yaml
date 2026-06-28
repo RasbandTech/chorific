@@ -347,6 +347,36 @@ paths:
               schema:
                 $ref: "#/components/schemas/Payout"
 
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get household spending plan settings
+      responses:
+        "200":
+          description: Current settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+    put:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update household spending plan settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsInput"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settings"
+
   /summary:
     get:
       operationId: getSummary
@@ -603,6 +633,40 @@ components:
         amount:
           type: number
           minimum: 0
+
+    Settings:
+      type: object
+      required: [charityPercent, savingsPercent, spendingPercent]
+      properties:
+        charityPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        savingsPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        spendingPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+
+    SettingsInput:
+      type: object
+      required: [charityPercent, savingsPercent, spendingPercent]
+      properties:
+        charityPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        savingsPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+        spendingPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
 
     HouseholdSummary:
       type: object

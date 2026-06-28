@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   useGetMembers, 
   useGetChores,
@@ -13,6 +13,9 @@ import {
   getGetMembersQueryKey,
   getGetChoresQueryKey,
   getGetChecklistQueryKey,
+  useGetSettings,
+  useUpdateSettings,
+  getGetSettingsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
@@ -38,7 +41,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Users, ClipboardList, Plus, Trash2, Edit2, AlertCircle } from "lucide-react";
+import { Users, ClipboardList, Plus, Trash2, Edit2, AlertCircle, Settings2, Heart, PiggyBank, ShoppingBag } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -97,6 +100,7 @@ function getIconComponent(iconName: string) {
 export default function Manage() {
   const { data: members, isLoading: isLoadingMembers } = useGetMembers();
   const { data: chores, isLoading: isLoadingChores } = useGetChores();
+  const { data: settings } = useGetSettings();
   
   const createMember = useCreateMember();
   const updateMember = useUpdateMember();
@@ -107,6 +111,7 @@ export default function Manage() {
   const deleteChore = useDeleteChore();
   const assignChore = useAssignChore();
   const unassignChore = useUnassignChore();
+  const updateSettings = useUpdateSettings();
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -116,6 +121,39 @@ export default function Manage() {
 
   const [choreDialogOpen, setChoreDialogOpen] = useState(false);
   const [editingChoreId, setEditingChoreId] = useState<number | null>(null);
+
+  const [charityPct, setCharityPct] = useState(10);
+  const [savingsPct, setSavingsPct] = useState(20);
+  const [spendingPct, setSpendingPct] = useState(70);
+
+  useEffect(() => {
+    if (settings) {
+      setCharityPct(settings.charityPercent);
+      setSavingsPct(settings.savingsPercent);
+      setSpendingPct(settings.spendingPercent);
+    }
+  }, [settings]);
+
+  const pctTotal = charityPct + savingsPct + spendingPct;
+
+  const handleSaveSettings = () => {
+    if (pctTotal !== 100) {
+      toast({ title: "Percentages must add up to 100%", variant: "destructive" });
+      return;
+    }
+    updateSettings.mutate(
+      { data: { charityPercent: charityPct, savingsPercent: savingsPct, spendingPercent: spendingPct } },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+          toast({ title: "Spending plan saved!" });
+        },
+        onError: () => {
+          toast({ title: "Failed to save settings", variant: "destructive" });
+        },
+      }
+    );
+  };
 
   const memberForm = useForm<MemberFormValues>({
     resolver: zodResolver(memberSchema),
@@ -249,14 +287,18 @@ export default function Manage() {
       </div>
 
       <Tabs defaultValue="members" className="w-full">
-        <TabsList className="w-full grid grid-cols-2 mb-6">
+        <TabsList className="w-full grid grid-cols-3 mb-6">
           <TabsTrigger value="members" className="flex items-center gap-2">
             <Users className="w-4 h-4" />
-            Family Members
+            Members
           </TabsTrigger>
           <TabsTrigger value="chores" className="flex items-center gap-2">
             <ClipboardList className="w-4 h-4" />
-            Chores List
+            Chores
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings2 className="w-4 h-4" />
+            Settings
           </TabsTrigger>
         </TabsList>
         
@@ -414,6 +456,160 @@ export default function Manage() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight mb-1">Spending Plan</h2>
+            <p className="text-sm text-muted-foreground">
+              Set recommended percentages for how kids should split their payout. These are shown as a guide during each payout.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Charity */}
+            <Card className="border-red-100 bg-red-50/40">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                    <Heart className="w-4 h-4 text-red-500" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">Charity</p>
+                    <p className="text-xs text-muted-foreground">Give back to others</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={charityPct}
+                    onChange={e => setCharityPct(Number(e.target.value))}
+                    className="flex-1 accent-red-500"
+                  />
+                  <div className="flex items-center border rounded-lg overflow-hidden bg-white w-20">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={charityPct}
+                      onChange={e => setCharityPct(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      className="border-0 text-center font-bold p-1 h-8 w-14"
+                    />
+                    <span className="pr-2 text-sm text-muted-foreground">%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Savings */}
+            <Card className="border-blue-100 bg-blue-50/40">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <PiggyBank className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">Savings</p>
+                    <p className="text-xs text-muted-foreground">Save for the future</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={savingsPct}
+                    onChange={e => setSavingsPct(Number(e.target.value))}
+                    className="flex-1 accent-blue-500"
+                  />
+                  <div className="flex items-center border rounded-lg overflow-hidden bg-white w-20">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={savingsPct}
+                      onChange={e => setSavingsPct(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      className="border-0 text-center font-bold p-1 h-8 w-14"
+                    />
+                    <span className="pr-2 text-sm text-muted-foreground">%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Spending */}
+            <Card className="border-green-100 bg-green-50/40">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                    <ShoppingBag className="w-4 h-4 text-green-500" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm">Spending</p>
+                    <p className="text-xs text-muted-foreground">Enjoy now</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={spendingPct}
+                    onChange={e => setSpendingPct(Number(e.target.value))}
+                    className="flex-1 accent-green-500"
+                  />
+                  <div className="flex items-center border rounded-lg overflow-hidden bg-white w-20">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={spendingPct}
+                      onChange={e => setSpendingPct(Math.min(100, Math.max(0, Number(e.target.value))))}
+                      className="border-0 text-center font-bold p-1 h-8 w-14"
+                    />
+                    <span className="pr-2 text-sm text-muted-foreground">%</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Total indicator */}
+            <div className={`flex items-center justify-between rounded-xl border px-4 py-3 font-semibold text-sm ${pctTotal === 100 ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"}`}>
+              <span>Total</span>
+              <span>{pctTotal}% {pctTotal === 100 ? "✓" : `(need ${100 - pctTotal > 0 ? "+" : ""}${100 - pctTotal}% to reach 100%)`}</span>
+            </div>
+
+            {/* Preview */}
+            <Card className="bg-muted/30">
+              <CardContent className="p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Preview for $10.00 payout</p>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-1.5"><Heart className="w-3.5 h-3.5 text-red-400" /> Charity</span>
+                    <span className="font-bold">${((10 * charityPct) / 100).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-1.5"><PiggyBank className="w-3.5 h-3.5 text-blue-400" /> Savings</span>
+                    <span className="font-bold">${((10 * savingsPct) / 100).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center gap-1.5"><ShoppingBag className="w-3.5 h-3.5 text-green-400" /> Spending</span>
+                    <span className="font-bold">${((10 * spendingPct) / 100).toFixed(2)}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Button
+              onClick={handleSaveSettings}
+              disabled={pctTotal !== 100 || updateSettings.isPending}
+              className="w-full rounded-full font-bold"
+            >
+              {updateSettings.isPending ? "Saving..." : "Save Spending Plan"}
+            </Button>
+          </div>
         </TabsContent>
       </Tabs>
 
