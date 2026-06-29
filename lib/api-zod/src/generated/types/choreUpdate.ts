@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ChoreUpdateFrequency } from './choreUpdateFrequency';
+import type { ChoreUpdateTimeOfDay } from './choreUpdateTimeOfDay';
 
 export interface ChoreUpdate {
   /** @minLength 1 */
@@ -16,4 +17,6 @@ export interface ChoreUpdate {
   frequency?: ChoreUpdateFrequency;
   /** @nullable */
   scheduledDays?: number[] | null;
+  /** @nullable */
+  timeOfDay?: ChoreUpdateTimeOfDay;
 }

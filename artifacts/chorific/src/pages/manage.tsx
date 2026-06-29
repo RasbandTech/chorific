@@ -86,6 +86,7 @@ const choreSchema = z.object({
   dollarValue: z.coerce.number().min(0, "Must be at least 0"),
   frequency: z.enum(["daily", "weekly"]),
   scheduledDays: z.array(z.number()).optional(),
+  timeOfDay: z.enum(["morning", "afternoon", "evening"]).nullable().optional(),
   assignedMemberIds: z.array(z.number()),
 });
 
@@ -162,7 +163,7 @@ export default function Manage() {
 
   const choreForm = useForm<ChoreFormValues>({
     resolver: zodResolver(choreSchema),
-    defaultValues: { name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], assignedMemberIds: [] }
+    defaultValues: { name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], timeOfDay: null, assignedMemberIds: [] }
   });
 
   const watchedFrequency = useWatch({ control: choreForm.control, name: "frequency" });
@@ -210,7 +211,7 @@ export default function Manage() {
 
   const onOpenChoreNew = () => {
     setEditingChoreId(null);
-    choreForm.reset({ name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], assignedMemberIds: [] });
+    choreForm.reset({ name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], timeOfDay: null, assignedMemberIds: [] });
     setChoreDialogOpen(true);
   };
 
@@ -222,6 +223,7 @@ export default function Manage() {
       dollarValue: chore.dollarValue, 
       frequency: chore.frequency,
       scheduledDays: chore.scheduledDays || [],
+      timeOfDay: (chore.timeOfDay as "morning" | "afternoon" | "evening" | null) ?? null,
       assignedMemberIds: chore.assignedMemberIds || [] 
     });
     setChoreDialogOpen(true);
@@ -237,12 +239,13 @@ export default function Manage() {
   };
 
   const onChoreSubmit = (data: ChoreFormValues) => {
-    const { assignedMemberIds, scheduledDays, ...choreData } = data;
+    const { assignedMemberIds, scheduledDays, timeOfDay, ...choreData } = data;
     const payload = {
       ...choreData,
       scheduledDays: data.frequency === "weekly" && scheduledDays && scheduledDays.length > 0
         ? scheduledDays
         : null,
+      timeOfDay: timeOfDay ?? null,
     };
 
     if (editingChoreId) {
@@ -396,8 +399,15 @@ export default function Manage() {
                         </div>
                         <div>
                           <h3 className="font-bold">{chore.name}</h3>
-                          <div className="text-xs font-semibold text-primary/80 uppercase tracking-wider">
-                            ${chore.dollarValue.toFixed(2)} • {chore.frequency}
+                          <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                            <span className="text-xs font-semibold text-primary/80 uppercase tracking-wider">
+                              ${chore.dollarValue.toFixed(2)} • {chore.frequency}
+                            </span>
+                            {chore.timeOfDay && (
+                              <span className="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                                {chore.timeOfDay === "morning" ? "🌅" : chore.timeOfDay === "afternoon" ? "☀️" : "🌙"} {chore.timeOfDay}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -770,6 +780,42 @@ export default function Manage() {
                   )}
                 />
               )}
+
+              <FormField
+                control={choreForm.control}
+                name="timeOfDay"
+                render={({ field }) => {
+                  const options = [
+                    { value: null,        label: "Any time", emoji: "🕐" },
+                    { value: "morning",   label: "Morning",  emoji: "🌅" },
+                    { value: "afternoon", label: "Afternoon",emoji: "☀️" },
+                    { value: "evening",   label: "Evening",  emoji: "🌙" },
+                  ] as const;
+                  return (
+                    <FormItem>
+                      <FormLabel>Time of Day</FormLabel>
+                      <div className="flex gap-2 flex-wrap mt-1">
+                        {options.map(opt => (
+                          <button
+                            key={String(opt.value)}
+                            type="button"
+                            onClick={() => field.onChange(opt.value)}
+                            className={`flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm font-medium transition-colors ${
+                              field.value === opt.value
+                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
+                            }`}
+                          >
+                            <span>{opt.emoji}</span>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
 
               <FormField
                 control={choreForm.control}

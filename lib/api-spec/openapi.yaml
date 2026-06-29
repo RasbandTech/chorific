@@ -452,6 +452,10 @@ components:
           items:
             type: integer
           description: "Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores."
+        timeOfDay:
+          type: ["string", "null"]
+          enum: [morning, afternoon, evening, null]
+          description: "Time of day grouping for the chore."
         assignedMemberIds:
           type: array
           items:
@@ -478,6 +482,9 @@ components:
           type: ["array", "null"]
           items:
             type: integer
+        timeOfDay:
+          type: ["string", "null"]
+          enum: [morning, afternoon, evening, null]
 
     ChoreUpdate:
       type: object
@@ -497,6 +504,9 @@ components:
           type: ["array", "null"]
           items:
             type: integer
+        timeOfDay:
+          type: ["string", "null"]
+          enum: [morning, afternoon, evening, null]
 
     Assignment:
       type: object

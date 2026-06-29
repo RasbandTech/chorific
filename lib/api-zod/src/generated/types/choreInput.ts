@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ChoreInputFrequency } from './choreInputFrequency';
+import type { ChoreInputTimeOfDay } from './choreInputTimeOfDay';
 
 export interface ChoreInput {
   /** @minLength 1 */
@@ -16,4 +17,6 @@ export interface ChoreInput {
   frequency: ChoreInputFrequency;
   /** @nullable */
   scheduledDays?: number[] | null;
+  /** @nullable */
+  timeOfDay?: ChoreInputTimeOfDay;
 }

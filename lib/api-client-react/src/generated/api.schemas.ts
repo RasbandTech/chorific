@@ -36,6 +36,19 @@ export const ChoreFrequency = {
   weekly: 'weekly',
 } as const;
 
+/**
+ * Time of day grouping for the chore.
+ * @nullable
+ */
+export type ChoreTimeOfDay = typeof ChoreTimeOfDay[keyof typeof ChoreTimeOfDay] | null;
+
+
+export const ChoreTimeOfDay = {
+  morning: 'morning',
+  afternoon: 'afternoon',
+  evening: 'evening',
+} as const;
+
 export interface Chore {
   id: number;
   name: string;
@@ -47,6 +60,11 @@ export interface Chore {
      * @nullable
      */
   scheduledDays?: number[] | null;
+  /**
+     * Time of day grouping for the chore.
+     * @nullable
+     */
+  timeOfDay?: ChoreTimeOfDay;
   assignedMemberIds?: number[];
   createdAt: string;
 }
@@ -59,6 +77,18 @@ export const ChoreInputFrequency = {
   weekly: 'weekly',
 } as const;
 
+/**
+ * @nullable
+ */
+export type ChoreInputTimeOfDay = typeof ChoreInputTimeOfDay[keyof typeof ChoreInputTimeOfDay] | null;
+
+
+export const ChoreInputTimeOfDay = {
+  morning: 'morning',
+  afternoon: 'afternoon',
+  evening: 'evening',
+} as const;
+
 export interface ChoreInput {
   /** @minLength 1 */
   name: string;
@@ -68,6 +98,8 @@ export interface ChoreInput {
   frequency: ChoreInputFrequency;
   /** @nullable */
   scheduledDays?: number[] | null;
+  /** @nullable */
+  timeOfDay?: ChoreInputTimeOfDay;
 }
 
 export type ChoreUpdateFrequency = typeof ChoreUpdateFrequency[keyof typeof ChoreUpdateFrequency];
@@ -76,6 +108,18 @@ export type ChoreUpdateFrequency = typeof ChoreUpdateFrequency[keyof typeof Chor
 export const ChoreUpdateFrequency = {
   daily: 'daily',
   weekly: 'weekly',
+} as const;
+
+/**
+ * @nullable
+ */
+export type ChoreUpdateTimeOfDay = typeof ChoreUpdateTimeOfDay[keyof typeof ChoreUpdateTimeOfDay] | null;
+
+
+export const ChoreUpdateTimeOfDay = {
+  morning: 'morning',
+  afternoon: 'afternoon',
+  evening: 'evening',
 } as const;
 
 export interface ChoreUpdate {
@@ -87,6 +131,8 @@ export interface ChoreUpdate {
   frequency?: ChoreUpdateFrequency;
   /** @nullable */
   scheduledDays?: number[] | null;
+  /** @nullable */
+  timeOfDay?: ChoreUpdateTimeOfDay;
 }
 
 export interface Assignment {

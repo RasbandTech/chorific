@@ -90,6 +90,7 @@ export const GetChoresResponseItem = zod.object({
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
   "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
+  "timeOfDay": zod.union([zod.literal('morning'),zod.literal('afternoon'),zod.literal('evening'),zod.literal(null)]).nullish().describe('Time of day grouping for the chore.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })
@@ -109,7 +110,8 @@ export const CreateChoreBody = zod.object({
   "icon": zod.string(),
   "dollarValue": zod.number().min(createChoreBodyDollarValueMin),
   "frequency": zod.enum(['daily', 'weekly']),
-  "scheduledDays": zod.array(zod.number()).nullish()
+  "scheduledDays": zod.array(zod.number()).nullish(),
+  "timeOfDay": zod.union([zod.literal('morning'),zod.literal('afternoon'),zod.literal('evening'),zod.literal(null)]).nullish()
 })
 
 export const CreateChoreResponse = zod.object({
@@ -119,6 +121,7 @@ export const CreateChoreResponse = zod.object({
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
   "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
+  "timeOfDay": zod.union([zod.literal('morning'),zod.literal('afternoon'),zod.literal('evening'),zod.literal(null)]).nullish().describe('Time of day grouping for the chore.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })
@@ -141,7 +144,8 @@ export const UpdateChoreBody = zod.object({
   "icon": zod.string().optional(),
   "dollarValue": zod.number().min(updateChoreBodyDollarValueMin).optional(),
   "frequency": zod.enum(['daily', 'weekly']).optional(),
-  "scheduledDays": zod.array(zod.number()).nullish()
+  "scheduledDays": zod.array(zod.number()).nullish(),
+  "timeOfDay": zod.union([zod.literal('morning'),zod.literal('afternoon'),zod.literal('evening'),zod.literal(null)]).nullish()
 })
 
 export const UpdateChoreResponse = zod.object({
@@ -151,6 +155,7 @@ export const UpdateChoreResponse = zod.object({
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
   "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
+  "timeOfDay": zod.union([zod.literal('morning'),zod.literal('afternoon'),zod.literal('evening'),zod.literal(null)]).nullish().describe('Time of day grouping for the chore.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })
@@ -213,6 +218,7 @@ export const GetChecklistResponseItem = zod.object({
   "dollarValue": zod.number(),
   "frequency": zod.enum(['daily', 'weekly']),
   "scheduledDays": zod.array(zod.number()).nullish().describe('Days of week (0=Sun, 1=Mon, ..., 6=Sat). Only used for weekly chores.'),
+  "timeOfDay": zod.union([zod.literal('morning'),zod.literal('afternoon'),zod.literal('evening'),zod.literal(null)]).nullish().describe('Time of day grouping for the chore.'),
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 }),

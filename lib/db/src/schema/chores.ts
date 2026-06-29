@@ -9,6 +9,7 @@ export const choresTable = pgTable("chores", {
   dollarValue: numeric("dollar_value", { precision: 10, scale: 2 }).notNull().default("0.25"),
   frequency: text("frequency").notNull().default("daily"),
   scheduledDays: text("scheduled_days"),
+  timeOfDay: text("time_of_day"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

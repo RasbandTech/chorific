@@ -11,7 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import * as Icons from "lucide-react";
-import { Check, Plus, Settings } from "lucide-react";
+import { Check, Plus, Settings, Sunrise, Sun, Moon } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
@@ -19,6 +19,13 @@ function getIcon(iconName: string) {
   const IconComponent = (Icons as any)[iconName];
   return IconComponent ? <IconComponent className="w-5 h-5" /> : <Icons.Circle className="w-5 h-5" />;
 }
+
+const TIME_GROUPS = [
+  { key: "morning",   label: "Morning",   Icon: Sunrise, color: "text-amber-500",  bg: "bg-amber-50"  },
+  { key: "afternoon", label: "Afternoon", Icon: Sun,     color: "text-orange-500", bg: "bg-orange-50" },
+  { key: "evening",   label: "Evening",   Icon: Moon,    color: "text-indigo-500", bg: "bg-indigo-50" },
+  { key: null,        label: "Anytime",   Icon: Icons.Clock, color: "text-muted-foreground", bg: "bg-muted/30" },
+] as const;
 
 export default function Home() {
   const { data: checklists, isLoading } = useGetChecklist();
@@ -88,6 +95,17 @@ export default function Home() {
           const progress = total > 0 ? (completedCount / total) * 100 : 0;
           const isAllDone = total > 0 && completedCount === total;
 
+          const grouped = TIME_GROUPS.map(group => ({
+            ...group,
+            items: list.chores.filter(item =>
+              group.key === null
+                ? !item.chore.timeOfDay
+                : item.chore.timeOfDay === group.key
+            ),
+          })).filter(g => g.items.length > 0);
+
+          const hasTimeGroups = list.chores.some(item => item.chore.timeOfDay);
+
           return (
             <div
               key={list.member.id}
@@ -125,43 +143,44 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Chore list — plain scrollable div, no Radix */}
-              <div className="p-3 space-y-2 overflow-y-auto" style={{ maxHeight: "60vh" }}>
+              {/* Chore list */}
+              <div className="p-3 space-y-1 overflow-y-auto" style={{ maxHeight: "60vh" }}>
                 {total === 0 ? (
                   <p className="text-center text-muted-foreground text-sm py-6">No chores today!</p>
+                ) : hasTimeGroups ? (
+                  <>
+                    {grouped.map(group => (
+                      <div key={String(group.key)} className="mb-1">
+                        <div className={`flex items-center gap-1.5 px-1 py-1.5 mb-1 rounded-lg ${group.bg}`}>
+                          <group.Icon className={`w-3.5 h-3.5 ${group.color}`} />
+                          <span className={`text-xs font-bold uppercase tracking-wider ${group.color}`}>
+                            {group.label}
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          {group.items.map((item) => (
+                            <ChoreButton
+                              key={item.chore.id}
+                              item={item}
+                              memberId={list.member.id}
+                              onToggle={handleToggle}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </>
                 ) : (
-                  list.chores.map((item) => {
-                    const isDone = item.completionId !== null;
-                    return (
-                      <button
+                  <div className="space-y-2">
+                    {list.chores.map((item) => (
+                      <ChoreButton
                         key={item.chore.id}
-                        onClick={() => handleToggle(item.chore.id, list.member.id, item.completionId)}
-                        className={`w-full text-left p-3 rounded-xl border transition-all flex items-center gap-3 ${
-                          isDone
-                            ? "bg-muted/40 border-muted-foreground/20"
-                            : "bg-white border-border hover:border-primary/40 hover:shadow-sm"
-                        }`}
-                      >
-                        <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-                            isDone
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          {isDone ? <Check className="w-4 h-4" /> : getIcon(item.chore.icon)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-semibold text-sm truncate ${isDone ? "line-through text-muted-foreground" : "text-foreground"}`}>
-                            {item.chore.name}
-                          </p>
-                          <p className="text-xs font-bold text-primary">
-                            ${typeof item.chore.dollarValue === "number" ? item.chore.dollarValue.toFixed(2) : parseFloat(String(item.chore.dollarValue)).toFixed(2)}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })
+                        item={item}
+                        memberId={list.member.id}
+                        onToggle={handleToggle}
+                      />
+                    ))}
+                  </div>
                 )}
 
                 {isAllDone && (
@@ -176,5 +195,41 @@ export default function Home() {
         })}
       </div>
     </div>
+  );
+}
+
+function ChoreButton({ item, memberId, onToggle }: {
+  item: { chore: any; completionId: number | null; completedAt: string | null };
+  memberId: number;
+  onToggle: (choreId: number, memberId: number, completionId: number | null) => void;
+}) {
+  const isDone = item.completionId !== null;
+  return (
+    <button
+      onClick={() => onToggle(item.chore.id, memberId, item.completionId)}
+      className={`w-full text-left p-3 rounded-xl border transition-all flex items-center gap-3 ${
+        isDone
+          ? "bg-muted/40 border-muted-foreground/20"
+          : "bg-white border-border hover:border-primary/40 hover:shadow-sm"
+      }`}
+    >
+      <div
+        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+          isDone
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-muted-foreground"
+        }`}
+      >
+        {isDone ? <Check className="w-4 h-4" /> : getIcon(item.chore.icon)}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className={`font-semibold text-sm truncate ${isDone ? "line-through text-muted-foreground" : "text-foreground"}`}>
+          {item.chore.name}
+        </p>
+        <p className="text-xs font-bold text-primary">
+          ${typeof item.chore.dollarValue === "number" ? item.chore.dollarValue.toFixed(2) : parseFloat(String(item.chore.dollarValue)).toFixed(2)}
+        </p>
+      </div>
+    </button>
   );
 }

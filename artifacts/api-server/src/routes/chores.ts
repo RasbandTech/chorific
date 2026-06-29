@@ -17,6 +17,7 @@ function formatChore(chore: typeof choresTable.$inferSelect, assignments: { memb
     dollarValue: parseFloat(chore.dollarValue),
     frequency: chore.frequency,
     scheduledDays: parseScheduledDays(chore.scheduledDays),
+    timeOfDay: chore.timeOfDay ?? null,
     assignedMemberIds: assignments.map(a => a.memberId),
     createdAt: chore.createdAt.toISOString(),
   };
@@ -37,7 +38,7 @@ router.get("/chores", async (req, res) => {
 
 router.post("/chores", async (req, res) => {
   try {
-    const { name, icon = "Star", dollarValue = 0.25, frequency = "daily", scheduledDays } = req.body;
+    const { name, icon = "Star", dollarValue = 0.25, frequency = "daily", scheduledDays, timeOfDay } = req.body;
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return res.status(400).json({ error: "Name is required" });
     }
@@ -47,6 +48,7 @@ router.post("/chores", async (req, res) => {
       dollarValue: String(dollarValue),
       frequency,
       scheduledDays: scheduledDays ? JSON.stringify(scheduledDays) : null,
+      timeOfDay: timeOfDay ?? null,
     }).returning();
     res.status(201).json(formatChore(chore, []));
   } catch (err) {
@@ -57,13 +59,14 @@ router.post("/chores", async (req, res) => {
 router.patch("/chores/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const { name, icon, dollarValue, frequency, scheduledDays } = req.body;
+    const { name, icon, dollarValue, frequency, scheduledDays, timeOfDay } = req.body;
     const updates: Record<string, unknown> = {};
     if (name !== undefined) updates.name = name;
     if (icon !== undefined) updates.icon = icon;
     if (dollarValue !== undefined) updates.dollarValue = String(dollarValue);
     if (frequency !== undefined) updates.frequency = frequency;
     if (scheduledDays !== undefined) updates.scheduledDays = scheduledDays ? JSON.stringify(scheduledDays) : null;
+    if (timeOfDay !== undefined) updates.timeOfDay = timeOfDay ?? null;
     const [chore] = await db.update(choresTable).set(updates).where(eq(choresTable.id, id)).returning();
     if (!chore) return res.status(404).json({ error: "Chore not found" });
     const assignments = await db.select().from(assignmentsTable).where(eq(assignmentsTable.choreId, id));

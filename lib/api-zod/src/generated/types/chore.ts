@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ChoreFrequency } from './choreFrequency';
+import type { ChoreTimeOfDay } from './choreTimeOfDay';
 
 export interface Chore {
   id: number;
@@ -18,6 +19,11 @@ export interface Chore {
      * @nullable
      */
   scheduledDays?: number[] | null;
+  /**
+     * Time of day grouping for the chore.
+     * @nullable
+     */
+  timeOfDay?: ChoreTimeOfDay;
   assignedMemberIds?: number[];
   createdAt: string;
 }
