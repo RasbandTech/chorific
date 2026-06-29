@@ -1,6 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Wallet, History, Settings } from "lucide-react";
+import { LayoutDashboard, Wallet, History, Settings, Heart } from "lucide-react";
+
+const SUPPORT_URL = "https://buy.stripe.com/7sY00bgT0edo8c63HW3sI02";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
@@ -32,12 +34,30 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          <a
+            href={SUPPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-2 flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-sm bg-pink-50 text-pink-600 border border-pink-200 hover:bg-pink-100 transition-colors"
+          >
+            <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" />
+            Support this app
+          </a>
         </nav>
       </header>
 
       {/* Mobile Header */}
-      <header className="md:hidden sticky top-0 z-50 bg-card border-b px-4 h-14 flex items-center justify-center">
+      <header className="md:hidden sticky top-0 z-50 bg-card border-b px-4 h-14 flex items-center justify-between">
         <span className="font-bold text-lg text-primary tracking-tight">Chorific</span>
+        <a
+          href={SUPPORT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-pink-50 text-pink-600 border border-pink-200 hover:bg-pink-100 transition-colors"
+        >
+          <Heart className="w-3 h-3 fill-pink-500 text-pink-500" />
+          Support
+        </a>
       </header>
 
       {/* Main Content */}
