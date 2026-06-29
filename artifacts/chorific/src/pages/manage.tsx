@@ -57,11 +57,12 @@ const PRESET_COLORS = [
 ];
 
 const PRESET_ICONS = [
-  { category: "Cleaning", icons: ["Trash2", "Sparkles", "WashingMachine", "Droplets"] },
-  { category: "Kitchen", icons: ["UtensilsCrossed", "Coffee", "ShoppingCart", "Apple"] },
-  { category: "Outdoor", icons: ["Leaf", "Trees", "Sun", "Wind"] },
-  { category: "Pets", icons: ["Dog", "Cat", "Fish"] },
-  { category: "Study", icons: ["BookOpen", "Pencil", "GraduationCap"] },
+  { category: "Cleaning", icons: ["Trash2", "Sparkles", "WashingMachine", "Droplets", "Brush", "Eraser"] },
+  { category: "Bathroom", icons: ["Bath", "ShowerHead", "Droplet", "ToiletIcon", "Brush", "Sparkles"] },
+  { category: "Kitchen", icons: ["UtensilsCrossed", "Coffee", "ShoppingCart", "Apple", "CookingPot", "Refrigerator"] },
+  { category: "Yard", icons: ["Shovel", "Scissors", "Sprout", "Flower2", "TreePine", "Axe", "Leaf", "Trees", "CloudRain", "Tractor"] },
+  { category: "Pets", icons: ["Dog", "Cat", "Fish", "Bird", "Rabbit", "PawPrint"] },
+  { category: "Study", icons: ["BookOpen", "Pencil", "GraduationCap", "Brain", "Calculator", "Library"] },
   { category: "Misc", icons: ["Star", "Heart", "Zap", "Package", "Hammer", "Wrench", "Shirt", "Bed", "Car", "Baby"] }
 ];
 
