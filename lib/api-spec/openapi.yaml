@@ -15,6 +15,8 @@ tags:
     description: Chore management
   - name: checklist
     description: Daily chore checklist
+  - name: adhoc
+    description: Ad hoc chore operations
   - name: history
     description: Completion history
   - name: balances
@@ -237,6 +239,19 @@ paths:
                 items:
                   $ref: "#/components/schemas/MemberChecklist"
 
+  /adhoc:
+    get:
+      operationId: getAdhoc
+      tags: [adhoc]
+      summary: Get all ad hoc chores and today's ad hoc completions
+      responses:
+        "200":
+          description: Ad hoc chores and today completions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdhocChecklist"
+
   /completions:
     post:
       operationId: completeChore
@@ -446,7 +461,7 @@ components:
           type: number
         frequency:
           type: string
-          enum: [daily, weekly]
+          enum: [daily, weekly, adhoc]
         scheduledDays:
           type: ["array", "null"]
           items:
@@ -477,7 +492,7 @@ components:
           minimum: 0
         frequency:
           type: string
-          enum: [daily, weekly]
+          enum: [daily, weekly, adhoc]
         scheduledDays:
           type: ["array", "null"]
           items:
@@ -499,7 +514,7 @@ components:
           minimum: 0
         frequency:
           type: string
-          enum: [daily, weekly]
+          enum: [daily, weekly, adhoc]
         scheduledDays:
           type: ["array", "null"]
           items:
@@ -677,6 +692,38 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+
+    AdhocCompletion:
+      type: object
+      required: [id, choreId, choreName, choreIcon, dollarValue, memberId, completedAt]
+      properties:
+        id:
+          type: integer
+        choreId:
+          type: integer
+        choreName:
+          type: string
+        choreIcon:
+          type: string
+        dollarValue:
+          type: number
+        memberId:
+          type: integer
+        completedAt:
+          type: string
+
+    AdhocChecklist:
+      type: object
+      required: [chores, completions]
+      properties:
+        chores:
+          type: array
+          items:
+            $ref: "#/components/schemas/Chore"
+        completions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdhocCompletion"
 
     HouseholdSummary:
       type: object

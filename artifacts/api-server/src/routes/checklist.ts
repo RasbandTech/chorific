@@ -28,7 +28,7 @@ router.get("/checklist", async (req, res) => {
   try {
     const { start, end } = todayRange();
     const members = await db.select().from(membersTable).orderBy(membersTable.createdAt);
-    const chores = await db.select().from(choresTable);
+    const chores = (await db.select().from(choresTable)).filter(c => c.frequency !== "adhoc");
     const allAssignments = await db.select().from(assignmentsTable);
     const todayCompletions = await db.select().from(completionsTable)
       .where(and(gte(completionsTable.completedAt, start), lt(completionsTable.completedAt, end)));

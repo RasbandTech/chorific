@@ -6,6 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './adhocChecklist';
+export * from './adhocCompletion';
 export * from './assignment';
 export * from './assignmentInput';
 export * from './checklistItem';

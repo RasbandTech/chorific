@@ -100,7 +100,7 @@ const choreSchema = z.object({
   name: z.string().min(1, "Name is required"),
   icon: z.string().min(1, "Icon is required"),
   dollarValue: z.coerce.number().min(0, "Must be at least 0"),
-  frequency: z.enum(["daily", "weekly"]),
+  frequency: z.enum(["daily", "weekly", "adhoc"]),
   scheduledDays: z.array(z.number()).optional(),
   timeOfDay: z.enum(["morning", "afternoon", "evening"]).nullable().optional(),
   assignedMemberIds: z.array(z.number()),
@@ -748,7 +748,7 @@ export default function Manage() {
                       <FormLabel>Frequency</FormLabel>
                       <Select value={field.value} onValueChange={(val) => {
                         field.onChange(val);
-                        if (val === "daily") choreForm.setValue("scheduledDays", []);
+                        if (val === "daily" || val === "adhoc") choreForm.setValue("scheduledDays", []);
                       }}>
                         <FormControl>
                           <SelectTrigger>
@@ -758,6 +758,7 @@ export default function Manage() {
                         <SelectContent>
                           <SelectItem value="daily">Daily</SelectItem>
                           <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="adhoc">Ad Hoc</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

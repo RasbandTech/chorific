@@ -12,4 +12,5 @@ export type ChoreUpdateFrequency = typeof ChoreUpdateFrequency[keyof typeof Chor
 export const ChoreUpdateFrequency = {
   daily: 'daily',
   weekly: 'weekly',
+  adhoc: 'adhoc',
 } as const;

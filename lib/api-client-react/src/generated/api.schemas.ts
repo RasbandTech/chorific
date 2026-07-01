@@ -34,6 +34,7 @@ export type ChoreFrequency = typeof ChoreFrequency[keyof typeof ChoreFrequency];
 export const ChoreFrequency = {
   daily: 'daily',
   weekly: 'weekly',
+  adhoc: 'adhoc',
 } as const;
 
 /**
@@ -75,6 +76,7 @@ export type ChoreInputFrequency = typeof ChoreInputFrequency[keyof typeof ChoreI
 export const ChoreInputFrequency = {
   daily: 'daily',
   weekly: 'weekly',
+  adhoc: 'adhoc',
 } as const;
 
 /**
@@ -108,6 +110,7 @@ export type ChoreUpdateFrequency = typeof ChoreUpdateFrequency[keyof typeof Chor
 export const ChoreUpdateFrequency = {
   daily: 'daily',
   weekly: 'weekly',
+  adhoc: 'adhoc',
 } as const;
 
 /**
@@ -243,6 +246,21 @@ export interface SettingsInput {
      * @maximum 100
      */
   spendingPercent: number;
+}
+
+export interface AdhocCompletion {
+  id: number;
+  choreId: number;
+  choreName: string;
+  choreIcon: string;
+  dollarValue: number;
+  memberId: number;
+  completedAt: string;
+}
+
+export interface AdhocChecklist {
+  chores: Chore[];
+  completions: AdhocCompletion[];
 }
 
 export interface HouseholdSummary {

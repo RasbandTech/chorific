@@ -20,6 +20,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdhocChecklist,
   Assignment,
   AssignmentInput,
   Chore,
@@ -930,6 +931,83 @@ export function useGetChecklist<TData = Awaited<ReturnType<typeof getChecklist>>
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetChecklistQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAdhocUrl = () => {
+
+
+
+
+  return `/api/adhoc`
+}
+
+/**
+ * @summary Get all ad hoc chores and today's ad hoc completions
+ */
+export const getAdhoc = async ( options?: RequestInit): Promise<AdhocChecklist> => {
+
+  return customFetch<AdhocChecklist>(getGetAdhocUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdhocQueryKey = () => {
+    return [
+    `/api/adhoc`
+    ] as const;
+    }
+
+
+export const getGetAdhocQueryOptions = <TData = Awaited<ReturnType<typeof getAdhoc>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdhoc>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdhocQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdhoc>>> = ({ signal }) => getAdhoc({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdhoc>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdhocQueryResult = NonNullable<Awaited<ReturnType<typeof getAdhoc>>>
+export type GetAdhocQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get all ad hoc chores and today's ad hoc completions
+ */
+
+export function useGetAdhoc<TData = Awaited<ReturnType<typeof getAdhoc>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdhoc>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdhocQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
