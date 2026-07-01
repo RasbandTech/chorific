@@ -807,7 +807,7 @@ export default function Manage() {
                 />
               )}
 
-              <FormField
+              {watchedFrequency !== "adhoc" && <FormField
                 control={choreForm.control}
                 name="timeOfDay"
                 render={({ field }) => {
@@ -841,7 +841,7 @@ export default function Manage() {
                     </FormItem>
                   );
                 }}
-              />
+              />}
 
               <FormField
                 control={choreForm.control}
