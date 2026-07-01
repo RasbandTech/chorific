@@ -52,6 +52,7 @@ router.get("/checklist", async (req, res) => {
             dollarValue: parseFloat(chore.dollarValue),
             frequency: chore.frequency,
             scheduledDays: parseScheduledDays(chore.scheduledDays),
+            timeOfDay: chore.timeOfDay ?? null,
             assignedMemberIds: choreAssignments.map(a => a.memberId),
             createdAt: chore.createdAt.toISOString(),
           },
