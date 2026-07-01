@@ -5,6 +5,9 @@ import {
   getGetAdhocQueryKey,
   useCompleteChore,
   useUncompleteChore,
+  useAssignAdhocChore,
+  useCompleteAdhocChore,
+  useRemoveAdhocPending,
   getGetSummaryQueryKey,
   getGetBalancesQueryKey,
   getGetHistoryQueryKey,
@@ -67,6 +70,9 @@ export default function Home() {
   const { data: adhocData, isLoading: isLoadingAdhoc } = useGetAdhoc();
   const completeChore = useCompleteChore();
   const uncompleteChore = useUncompleteChore();
+  const assignAdhocChore = useAssignAdhocChore();
+  const completeAdhocChore = useCompleteAdhocChore();
+  const removeAdhocPending = useRemoveAdhocPending();
   const queryClient = useQueryClient();
 
   const [adhocDialogMemberId, setAdhocDialogMemberId] = useState<number | null>(null);
@@ -88,10 +94,11 @@ export default function Home() {
     }
   };
 
+  // Assign an ad hoc chore to a member as unchecked
   const handleAddAdhoc = (choreId: number) => {
     if (!adhocDialogMemberId) return;
     setAddingChoreId(choreId);
-    completeChore.mutate(
+    assignAdhocChore.mutate(
       { data: { choreId, memberId: adhocDialogMemberId } },
       {
         onSuccess: () => {
@@ -104,7 +111,18 @@ export default function Home() {
     );
   };
 
+  // Check off a pending ad hoc item
+  const handleCompletePending = (pendingId: number) => {
+    completeAdhocChore.mutate({ pendingId }, { onSuccess: invalidate });
+  };
+
+  // Remove a pending ad hoc item without completing it
+  const handleRemovePending = (pendingId: number) => {
+    removeAdhocPending.mutate({ pendingId }, { onSuccess: invalidate });
+  };
+
   const adhocChores = adhocData?.chores ?? [];
+  const adhocPending = adhocData?.pending ?? [];
   const adhocCompletions = adhocData?.completions ?? [];
 
   if (isLoading || isLoadingAdhoc) {
@@ -183,11 +201,17 @@ export default function Home() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2">
           {members.map(member => {
+            const memberPending = adhocPending.filter(p => p.memberId === member.id);
             const memberCompletions = adhocCompletions.filter(c => c.memberId === member.id);
+            const totalDone = memberCompletions.length;
+            const totalItems = memberPending.length + memberCompletions.length;
             return (
               <div key={member.id} className="w-64 shrink-0 rounded-2xl border bg-card shadow-sm flex flex-col">
                 <div className="h-1.5 w-full bg-violet-100 rounded-t-2xl overflow-hidden">
-                  <div className="h-full bg-violet-400 rounded-full" style={{ width: memberCompletions.length > 0 ? "100%" : "0%" }} />
+                  <div
+                    className="h-full bg-violet-400 rounded-full transition-all"
+                    style={{ width: totalItems > 0 ? `${(totalDone / totalItems) * 100}%` : "0%" }}
+                  />
                 </div>
                 <div className="px-3 py-2.5 border-b" style={{ backgroundColor: `${member.avatarColor}18` }}>
                   <div className="flex items-center gap-2.5">
@@ -200,34 +224,56 @@ export default function Home() {
                     <div>
                       <p className="font-bold text-sm leading-tight">{member.name}</p>
                       <p className="text-xs font-semibold text-violet-500">
-                        {memberCompletions.length} done today
+                        {totalDone} done today
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="p-2.5 space-y-1.5 overflow-y-auto" style={{ maxHeight: "40vh" }}>
-                  {memberCompletions.length === 0 ? (
+                  {totalItems === 0 ? (
                     <p className="text-center text-muted-foreground text-xs py-3">Nothing yet</p>
                   ) : (
-                    memberCompletions.map(comp => (
-                      <button
-                        key={comp.id}
-                        onClick={() => handleToggle(comp.choreId, comp.memberId, comp.id)}
-                        className="w-full text-left p-2.5 rounded-xl border transition-all flex items-center gap-2.5 bg-muted/40 border-muted-foreground/20"
-                      >
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-violet-500 text-white">
-                          <Check className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-xs truncate line-through text-muted-foreground">
-                            {comp.choreName}
-                          </p>
-                          <p className="text-xs font-bold text-violet-500">
-                            ${comp.dollarValue.toFixed(2)}
-                          </p>
-                        </div>
-                      </button>
-                    ))
+                    <>
+                      {memberPending.map(item => (
+                        <button
+                          key={`pending-${item.id}`}
+                          onClick={() => handleCompletePending(item.id)}
+                          className="w-full text-left p-2.5 rounded-xl border transition-all flex items-center gap-2.5 bg-background border-violet-200 hover:border-violet-400 hover:bg-violet-50"
+                        >
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 border-violet-300 bg-white text-violet-400">
+                            {getIcon(item.choreIcon)}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-xs truncate text-foreground">
+                              {item.choreName}
+                            </p>
+                            <p className="text-xs font-bold text-violet-500">
+                              ${item.dollarValue.toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="w-5 h-5 rounded-full border-2 border-violet-300 shrink-0" />
+                        </button>
+                      ))}
+                      {memberCompletions.map(comp => (
+                        <button
+                          key={`comp-${comp.id}`}
+                          onClick={() => handleToggle(comp.choreId, comp.memberId, comp.id)}
+                          className="w-full text-left p-2.5 rounded-xl border transition-all flex items-center gap-2.5 bg-muted/40 border-muted-foreground/20"
+                        >
+                          <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-violet-500 text-white">
+                            <Check className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-xs truncate line-through text-muted-foreground">
+                              {comp.choreName}
+                            </p>
+                            <p className="text-xs font-bold text-violet-500">
+                              ${comp.dollarValue.toFixed(2)}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </>
                   )}
                   <button
                     onClick={() => setAdhocDialogMemberId(member.id)}

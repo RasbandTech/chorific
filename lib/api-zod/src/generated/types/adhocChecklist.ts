@@ -6,9 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AdhocCompletion } from './adhocCompletion';
+import type { AdhocPendingItem } from './adhocPendingItem';
 import type { Chore } from './chore';
 
 export interface AdhocChecklist {
   chores: Chore[];
+  pending: AdhocPendingItem[];
   completions: AdhocCompletion[];
 }

@@ -20,7 +20,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AdhocAssignInput,
   AdhocChecklist,
+  AdhocCompletion,
+  AdhocPendingItem,
   Assignment,
   AssignmentInput,
   Chore,
@@ -1019,6 +1022,216 @@ export function useGetAdhoc<TData = Awaited<ReturnType<typeof getAdhoc>>, TError
 
 
 
+
+export const getAssignAdhocChoreUrl = () => {
+
+
+
+
+  return `/api/adhoc/assign`
+}
+
+/**
+ * @summary Assign an ad hoc chore to a member (unchecked)
+ */
+export const assignAdhocChore = async (adhocAssignInput: AdhocAssignInput, options?: RequestInit): Promise<AdhocPendingItem> => {
+
+  return customFetch<AdhocPendingItem>(getAssignAdhocChoreUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(adhocAssignInput)
+  }
+);}
+
+
+
+
+export const getAssignAdhocChoreMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignAdhocChore>>, TError,{data: BodyType<AdhocAssignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignAdhocChore>>, TError,{data: BodyType<AdhocAssignInput>}, TContext> => {
+
+const mutationKey = ['assignAdhocChore'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignAdhocChore>>, {data: BodyType<AdhocAssignInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  assignAdhocChore(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignAdhocChoreMutationResult = NonNullable<Awaited<ReturnType<typeof assignAdhocChore>>>
+    export type AssignAdhocChoreMutationBody = BodyType<AdhocAssignInput>
+    export type AssignAdhocChoreMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Assign an ad hoc chore to a member (unchecked)
+ */
+export const useAssignAdhocChore = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignAdhocChore>>, TError,{data: BodyType<AdhocAssignInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof assignAdhocChore>>,
+        TError,
+        {data: BodyType<AdhocAssignInput>},
+        TContext
+      > => {
+      return useMutation(getAssignAdhocChoreMutationOptions(options));
+    }
+
+export const getCompleteAdhocChoreUrl = (pendingId: number,) => {
+
+
+
+
+  return `/api/adhoc/complete/${pendingId}`
+}
+
+/**
+ * @summary Mark a pending ad hoc assignment as completed
+ */
+export const completeAdhocChore = async (pendingId: number, options?: RequestInit): Promise<AdhocCompletion> => {
+
+  return customFetch<AdhocCompletion>(getCompleteAdhocChoreUrl(pendingId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getCompleteAdhocChoreMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeAdhocChore>>, TError,{pendingId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeAdhocChore>>, TError,{pendingId: number}, TContext> => {
+
+const mutationKey = ['completeAdhocChore'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeAdhocChore>>, {pendingId: number}> = (props) => {
+          const {pendingId} = props ?? {};
+
+          return  completeAdhocChore(pendingId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteAdhocChoreMutationResult = NonNullable<Awaited<ReturnType<typeof completeAdhocChore>>>
+
+    export type CompleteAdhocChoreMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Mark a pending ad hoc assignment as completed
+ */
+export const useCompleteAdhocChore = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeAdhocChore>>, TError,{pendingId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof completeAdhocChore>>,
+        TError,
+        {pendingId: number},
+        TContext
+      > => {
+      return useMutation(getCompleteAdhocChoreMutationOptions(options));
+    }
+
+export const getRemoveAdhocPendingUrl = (pendingId: number,) => {
+
+
+
+
+  return `/api/adhoc/pending/${pendingId}`
+}
+
+/**
+ * @summary Remove a pending ad hoc assignment without completing it
+ */
+export const removeAdhocPending = async (pendingId: number, options?: RequestInit): Promise<void> => {
+
+  return customFetch<void>(getRemoveAdhocPendingUrl(pendingId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getRemoveAdhocPendingMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeAdhocPending>>, TError,{pendingId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeAdhocPending>>, TError,{pendingId: number}, TContext> => {
+
+const mutationKey = ['removeAdhocPending'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeAdhocPending>>, {pendingId: number}> = (props) => {
+          const {pendingId} = props ?? {};
+
+          return  removeAdhocPending(pendingId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveAdhocPendingMutationResult = NonNullable<Awaited<ReturnType<typeof removeAdhocPending>>>
+
+    export type RemoveAdhocPendingMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Remove a pending ad hoc assignment without completing it
+ */
+export const useRemoveAdhocPending = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeAdhocPending>>, TError,{pendingId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof removeAdhocPending>>,
+        TError,
+        {pendingId: number},
+        TContext
+      > => {
+      return useMutation(getRemoveAdhocPendingMutationOptions(options));
+    }
 
 export const getCompleteChoreUrl = () => {
 

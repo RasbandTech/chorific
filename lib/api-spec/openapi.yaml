@@ -252,6 +252,59 @@ paths:
               schema:
                 $ref: "#/components/schemas/AdhocChecklist"
 
+  /adhoc/assign:
+    post:
+      operationId: assignAdhocChore
+      tags: [adhoc]
+      summary: Assign an ad hoc chore to a member (unchecked)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdhocAssignInput"
+      responses:
+        "201":
+          description: Assignment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdhocPendingItem"
+
+  /adhoc/complete/{pendingId}:
+    post:
+      operationId: completeAdhocChore
+      tags: [adhoc]
+      summary: Mark a pending ad hoc assignment as completed
+      parameters:
+        - name: pendingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "201":
+          description: Completion recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdhocCompletion"
+
+  /adhoc/pending/{pendingId}:
+    delete:
+      operationId: removeAdhocPending
+      tags: [adhoc]
+      summary: Remove a pending ad hoc assignment without completing it
+      parameters:
+        - name: pendingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Pending assignment removed
+
   /completions:
     post:
       operationId: completeChore
@@ -712,14 +765,46 @@ components:
         completedAt:
           type: string
 
+    AdhocAssignInput:
+      type: object
+      required: [choreId, memberId]
+      properties:
+        choreId:
+          type: integer
+        memberId:
+          type: integer
+
+    AdhocPendingItem:
+      type: object
+      required: [id, choreId, choreName, choreIcon, dollarValue, memberId, assignedAt]
+      properties:
+        id:
+          type: integer
+        choreId:
+          type: integer
+        choreName:
+          type: string
+        choreIcon:
+          type: string
+        dollarValue:
+          type: number
+        memberId:
+          type: integer
+        assignedAt:
+          type: string
+
     AdhocChecklist:
       type: object
-      required: [chores, completions]
+      required: [chores, pending, completions]
       properties:
         chores:
           type: array
           items:
             $ref: "#/components/schemas/Chore"
+        pending:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdhocPendingItem"
         completions:
           type: array
           items:

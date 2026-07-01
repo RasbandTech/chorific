@@ -244,6 +244,15 @@ export const GetAdhocResponse = zod.object({
   "assignedMemberIds": zod.array(zod.number()).optional(),
   "createdAt": zod.string()
 })),
+  "pending": zod.array(zod.object({
+  "id": zod.number(),
+  "choreId": zod.number(),
+  "choreName": zod.string(),
+  "choreIcon": zod.string(),
+  "dollarValue": zod.number(),
+  "memberId": zod.number(),
+  "assignedAt": zod.string()
+})),
   "completions": zod.array(zod.object({
   "id": zod.number(),
   "choreId": zod.number(),
@@ -254,6 +263,53 @@ export const GetAdhocResponse = zod.object({
   "completedAt": zod.string()
 }))
 })
+
+
+/**
+ * @summary Assign an ad hoc chore to a member (unchecked)
+ */
+export const AssignAdhocChoreBody = zod.object({
+  "choreId": zod.number(),
+  "memberId": zod.number()
+})
+
+export const AssignAdhocChoreResponse = zod.object({
+  "id": zod.number(),
+  "choreId": zod.number(),
+  "choreName": zod.string(),
+  "choreIcon": zod.string(),
+  "dollarValue": zod.number(),
+  "memberId": zod.number(),
+  "assignedAt": zod.string()
+})
+
+
+/**
+ * @summary Mark a pending ad hoc assignment as completed
+ */
+export const CompleteAdhocChoreParams = zod.object({
+  "pendingId": zod.coerce.number()
+})
+
+export const CompleteAdhocChoreResponse = zod.object({
+  "id": zod.number(),
+  "choreId": zod.number(),
+  "choreName": zod.string(),
+  "choreIcon": zod.string(),
+  "dollarValue": zod.number(),
+  "memberId": zod.number(),
+  "completedAt": zod.string()
+})
+
+
+/**
+ * @summary Remove a pending ad hoc assignment without completing it
+ */
+export const RemoveAdhocPendingParams = zod.object({
+  "pendingId": zod.coerce.number()
+})
+
+export const RemoveAdhocPendingResponse = zod.void()
 
 
 /**

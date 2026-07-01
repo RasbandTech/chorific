@@ -258,8 +258,24 @@ export interface AdhocCompletion {
   completedAt: string;
 }
 
+export interface AdhocAssignInput {
+  choreId: number;
+  memberId: number;
+}
+
+export interface AdhocPendingItem {
+  id: number;
+  choreId: number;
+  choreName: string;
+  choreIcon: string;
+  dollarValue: number;
+  memberId: number;
+  assignedAt: string;
+}
+
 export interface AdhocChecklist {
   chores: Chore[];
+  pending: AdhocPendingItem[];
   completions: AdhocCompletion[];
 }
 
