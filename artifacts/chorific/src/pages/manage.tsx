@@ -57,7 +57,7 @@ const PRESET_COLORS = [
 ];
 
 const PRESET_ICONS = [
-  { category: "Cleaning", icons: ["Trash2", "Sparkles", "WashingMachine", "Droplets", "Brush", "Eraser", "Wind", "Recycle"] },
+  { category: "Cleaning", icons: ["Trash2", "Sparkles", "WashingMachine", "Droplets", "Brush", "Eraser", "Wind", "Recycle", "BrushCleaning", "SprayCan", "PaintBucket", "SoapDispenserDroplet"] },
   { category: "Bathroom", icons: ["Bath", "ShowerHead", "Droplet", "ToiletIcon", "Brush", "Sparkles", "Thermometer"] },
   { category: "Kitchen", icons: ["UtensilsCrossed", "Coffee", "ShoppingCart", "Apple", "CookingPot", "Refrigerator", "Pizza", "Sandwich", "Soup", "Citrus"] },
   { category: "Yard", icons: ["Shovel", "Scissors", "Sprout", "Flower2", "TreePine", "Axe", "Leaf", "Trees", "CloudRain", "Tractor", "Sun", "Cloudy"] },
@@ -69,7 +69,7 @@ const PRESET_ICONS = [
 ];
 
 const PRESET_EMOJIS = [
-  { category: "Cleaning", emojis: ["🧹", "🧺", "🧻", "🧽", "🪣", "🫧", "🧴", "🪠", "🫙", "🧯"] },
+  { category: "Cleaning", emojis: ["🧹", "🧺", "🧻", "🧽", "🪣", "🫧", "🧴", "🪠", "🫙", "🧯", "🪒", "🪄", "🧲", "🧪"] },
   { category: "Bathroom", emojis: ["🛁", "🚿", "🪥", "🧼", "🪒", "🪮", "💊", "🩺"] },
   { category: "Kitchen", emojis: ["🍽️", "🥄", "🍳", "🥗", "☕", "🧁", "🛒", "🍎", "🥪", "🍕", "🫕", "🥘", "🍱", "🥤"] },
   { category: "Yard", emojis: ["🌱", "🌿", "🌳", "🌸", "🌻", "🪴", "🍂", "🌾", "🍀", "🪨", "🌵", "🎋", "🪵", "☀️"] },
