@@ -807,89 +807,93 @@ export default function Manage() {
                 />
               )}
 
-              {watchedFrequency !== "adhoc" && <FormField
-                control={choreForm.control}
-                name="timeOfDay"
-                render={({ field }) => {
-                  const options = [
-                    { value: null,        label: "Any time", emoji: "🕐" },
-                    { value: "morning",   label: "Morning",  emoji: "🌅" },
-                    { value: "afternoon", label: "Afternoon",emoji: "☀️" },
-                    { value: "evening",   label: "Evening",  emoji: "🌙" },
-                  ] as const;
-                  return (
-                    <FormItem>
-                      <FormLabel>Time of Day</FormLabel>
-                      <div className="flex gap-2 flex-wrap mt-1">
-                        {options.map(opt => (
-                          <button
-                            key={String(opt.value)}
-                            type="button"
-                            onClick={() => field.onChange(opt.value)}
-                            className={`flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm font-medium transition-colors ${
-                              field.value === opt.value
-                                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                                : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
-                            }`}
-                          >
-                            <span>{opt.emoji}</span>
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />}
-
-              <FormField
-                control={choreForm.control}
-                name="assignedMemberIds"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Assigned To</FormLabel>
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      {members?.map((member) => (
-                        <FormField
-                          key={member.id}
-                          control={choreForm.control}
-                          name="assignedMemberIds"
-                          render={({ field }) => {
-                            return (
-                              <FormItem
-                                key={member.id}
-                                className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 bg-muted/20"
+              {watchedFrequency !== "adhoc" && (
+                <>
+                  <FormField
+                    control={choreForm.control}
+                    name="timeOfDay"
+                    render={({ field }) => {
+                      const options = [
+                        { value: null,        label: "Any time", emoji: "🕐" },
+                        { value: "morning",   label: "Morning",  emoji: "🌅" },
+                        { value: "afternoon", label: "Afternoon",emoji: "☀️" },
+                        { value: "evening",   label: "Evening",  emoji: "🌙" },
+                      ] as const;
+                      return (
+                        <FormItem>
+                          <FormLabel>Time of Day</FormLabel>
+                          <div className="flex gap-2 flex-wrap mt-1">
+                            {options.map(opt => (
+                              <button
+                                key={String(opt.value)}
+                                type="button"
+                                onClick={() => field.onChange(opt.value)}
+                                className={`flex items-center gap-1.5 px-3 py-2 rounded-full border text-sm font-medium transition-colors ${
+                                  field.value === opt.value
+                                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                                    : "bg-background text-muted-foreground border-border hover:border-primary/50 hover:text-primary"
+                                }`}
                               >
-                                <FormControl>
-                                  <Checkbox
-                                    checked={field.value?.includes(member.id)}
-                                    onCheckedChange={(checked) => {
-                                      return checked
-                                        ? field.onChange([...(field.value || []), member.id])
-                                        : field.onChange(
-                                            field.value?.filter((value) => value !== member.id)
-                                          )
-                                    }}
-                                  />
-                                </FormControl>
-                                <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
-                                  <div 
-                                    className="w-4 h-4 rounded-full" 
-                                    style={{ backgroundColor: member.avatarColor }}
-                                  />
-                                  {member.name}
-                                </FormLabel>
-                              </FormItem>
-                            )
-                          }}
-                        />
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                                <span>{opt.emoji}</span>
+                                {opt.label}
+                              </button>
+                            ))}
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
+
+                  <FormField
+                    control={choreForm.control}
+                    name="assignedMemberIds"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Assigned To</FormLabel>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          {members?.map((member) => (
+                            <FormField
+                              key={member.id}
+                              control={choreForm.control}
+                              name="assignedMemberIds"
+                              render={({ field }) => {
+                                return (
+                                  <FormItem
+                                    key={member.id}
+                                    className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-3 bg-muted/20"
+                                  >
+                                    <FormControl>
+                                      <Checkbox
+                                        checked={field.value?.includes(member.id)}
+                                        onCheckedChange={(checked) => {
+                                          return checked
+                                            ? field.onChange([...(field.value || []), member.id])
+                                            : field.onChange(
+                                                field.value?.filter((value) => value !== member.id)
+                                              )
+                                        }}
+                                      />
+                                    </FormControl>
+                                    <FormLabel className="font-normal cursor-pointer flex items-center gap-2">
+                                      <div
+                                        className="w-4 h-4 rounded-full"
+                                        style={{ backgroundColor: member.avatarColor }}
+                                      />
+                                      {member.name}
+                                    </FormLabel>
+                                  </FormItem>
+                                )
+                              }}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
 
               <FormField
                 control={choreForm.control}
