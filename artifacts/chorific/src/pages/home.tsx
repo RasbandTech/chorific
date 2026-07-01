@@ -16,6 +16,9 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 
 function getIcon(iconName: string) {
+  if (iconName?.startsWith("emoji:")) {
+    return <span className="text-lg leading-none">{iconName.slice(6)}</span>;
+  }
   const IconComponent = (Icons as any)[iconName];
   return IconComponent ? <IconComponent className="w-5 h-5" /> : <Icons.Circle className="w-5 h-5" />;
 }

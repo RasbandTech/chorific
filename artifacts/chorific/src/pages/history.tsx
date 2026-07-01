@@ -22,6 +22,9 @@ export default function History() {
   );
 
   const getIcon = (iconName: string) => {
+    if (iconName?.startsWith("emoji:")) {
+      return <span className="text-lg leading-none">{iconName.slice(6)}</span>;
+    }
     const IconComponent = (Icons as any)[iconName];
     return IconComponent ? <IconComponent className="w-5 h-5" /> : <Icons.CheckCircle2 className="w-5 h-5" />;
   };

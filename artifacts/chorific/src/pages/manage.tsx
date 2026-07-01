@@ -66,6 +66,16 @@ const PRESET_ICONS = [
   { category: "Misc", icons: ["Star", "Heart", "Zap", "Package", "Hammer", "Wrench", "Shirt", "Bed", "Car", "Baby"] }
 ];
 
+const PRESET_EMOJIS = [
+  { category: "Cleaning", emojis: ["🧹", "🧺", "🧻", "🧽", "🪣", "🫧", "🧴", "🪠"] },
+  { category: "Bathroom", emojis: ["🛁", "🚿", "🪥", "🧼", "🪒", "🪮"] },
+  { category: "Kitchen", emojis: ["🍽️", "🥄", "🍳", "🥗", "☕", "🧁", "🛒", "🍎"] },
+  { category: "Yard", emojis: ["🌱", "🌿", "🌳", "🌸", "🌻", "🪴", "🍂", "🌾"] },
+  { category: "Pets", emojis: ["🐕", "🐈", "🐠", "🐦", "🐇", "🐾", "🦴", "🐿️"] },
+  { category: "Study", emojis: ["📚", "✏️", "📝", "🎓", "🧠", "📖", "🖊️", "📐"] },
+  { category: "Misc", emojis: ["⭐", "❤️", "⚡", "📦", "🔨", "🔧", "👕", "🛏️", "🚗", "👶", "💰", "🎯", "🏆", "🎁"] }
+];
+
 const memberSchema = z.object({
   name: z.string().min(1, "Name is required"),
   avatarColor: z.string().min(1, "Color is required"),
@@ -94,9 +104,12 @@ const choreSchema = z.object({
 type MemberFormValues = z.infer<typeof memberSchema>;
 type ChoreFormValues = z.infer<typeof choreSchema>;
 
-function getIconComponent(iconName: string) {
+function getIconComponent(iconName: string, size = "w-5 h-5") {
+  if (iconName?.startsWith("emoji:")) {
+    return <span className="text-lg leading-none">{iconName.slice(6)}</span>;
+  }
   const Icon = (Icons as any)[iconName];
-  return Icon ? <Icon className="w-5 h-5" /> : <Icons.Circle className="w-5 h-5" />;
+  return Icon ? <Icon className={size} /> : <Icons.Circle className={size} />;
 }
 
 export default function Manage() {
@@ -123,6 +136,7 @@ export default function Manage() {
 
   const [choreDialogOpen, setChoreDialogOpen] = useState(false);
   const [editingChoreId, setEditingChoreId] = useState<number | null>(null);
+  const [iconMode, setIconMode] = useState<"icon" | "emoji">("icon");
 
   const [charityPct, setCharityPct] = useState(10);
   const [savingsPct, setSavingsPct] = useState(20);
@@ -212,12 +226,14 @@ export default function Manage() {
 
   const onOpenChoreNew = () => {
     setEditingChoreId(null);
+    setIconMode("icon");
     choreForm.reset({ name: "", icon: "Sparkles", dollarValue: 1, frequency: "daily", scheduledDays: [], timeOfDay: null, assignedMemberIds: [] });
     setChoreDialogOpen(true);
   };
 
   const onOpenChoreEdit = (chore: any) => {
     setEditingChoreId(chore.id);
+    setIconMode(chore.icon?.startsWith("emoji:") ? "emoji" : "icon");
     choreForm.reset({ 
       name: chore.name, 
       icon: chore.icon, 
@@ -871,26 +887,72 @@ export default function Manage() {
                 name="icon"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Icon</FormLabel>
+                    <div className="flex items-center justify-between mb-1">
+                      <FormLabel className="mb-0">Icon</FormLabel>
+                      <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIconMode("icon");
+                            if (field.value?.startsWith("emoji:")) field.onChange("Sparkles");
+                          }}
+                          className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${iconMode === "icon" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                          Icons
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIconMode("emoji");
+                            if (!field.value?.startsWith("emoji:")) field.onChange("emoji:⭐");
+                          }}
+                          className={`px-3 py-1 rounded-md text-xs font-medium transition-colors ${iconMode === "emoji" ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                          Emoji
+                        </button>
+                      </div>
+                    </div>
                     <FormControl>
                       <div className="border rounded-xl p-4 bg-muted/10 h-64 overflow-y-auto">
-                        {PRESET_ICONS.map(category => (
-                          <div key={category.category} className="mb-4 last:mb-0">
-                            <h4 className="text-xs font-semibold text-muted-foreground mb-2 uppercase">{category.category}</h4>
-                            <div className="grid grid-cols-6 gap-2">
-                              {category.icons.map(iconName => (
-                                <div 
-                                  key={iconName}
-                                  onClick={() => field.onChange(iconName)}
-                                  className={`aspect-square flex items-center justify-center rounded-md cursor-pointer transition-colors ${field.value === iconName ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background hover:bg-muted text-muted-foreground'}`}
-                                  title={iconName}
-                                >
-                                  {getIconComponent(iconName)}
-                                </div>
-                              ))}
+                        {iconMode === "icon" ? (
+                          PRESET_ICONS.map(category => (
+                            <div key={category.category} className="mb-4 last:mb-0">
+                              <h4 className="text-xs font-semibold text-muted-foreground mb-2 uppercase">{category.category}</h4>
+                              <div className="grid grid-cols-6 gap-2">
+                                {category.icons.map(iconName => (
+                                  <div
+                                    key={iconName}
+                                    onClick={() => field.onChange(iconName)}
+                                    className={`aspect-square flex items-center justify-center rounded-md cursor-pointer transition-colors ${field.value === iconName ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background hover:bg-muted text-muted-foreground'}`}
+                                    title={iconName}
+                                  >
+                                    {getIconComponent(iconName)}
+                                  </div>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))
+                        ) : (
+                          PRESET_EMOJIS.map(category => (
+                            <div key={category.category} className="mb-4 last:mb-0">
+                              <h4 className="text-xs font-semibold text-muted-foreground mb-2 uppercase">{category.category}</h4>
+                              <div className="grid grid-cols-8 gap-1">
+                                {category.emojis.map(emoji => {
+                                  const emojiValue = `emoji:${emoji}`;
+                                  return (
+                                    <div
+                                      key={emoji}
+                                      onClick={() => field.onChange(emojiValue)}
+                                      className={`aspect-square flex items-center justify-center rounded-md cursor-pointer text-xl transition-colors ${field.value === emojiValue ? 'bg-primary shadow-sm ring-2 ring-primary' : 'bg-background hover:bg-muted'}`}
+                                    >
+                                      {emoji}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </div>
                     </FormControl>
                     <FormMessage />
