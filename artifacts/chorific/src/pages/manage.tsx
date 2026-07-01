@@ -57,23 +57,28 @@ const PRESET_COLORS = [
 ];
 
 const PRESET_ICONS = [
-  { category: "Cleaning", icons: ["Trash2", "Sparkles", "WashingMachine", "Droplets", "Brush", "Eraser"] },
-  { category: "Bathroom", icons: ["Bath", "ShowerHead", "Droplet", "ToiletIcon", "Brush", "Sparkles"] },
-  { category: "Kitchen", icons: ["UtensilsCrossed", "Coffee", "ShoppingCart", "Apple", "CookingPot", "Refrigerator"] },
-  { category: "Yard", icons: ["Shovel", "Scissors", "Sprout", "Flower2", "TreePine", "Axe", "Leaf", "Trees", "CloudRain", "Tractor"] },
-  { category: "Pets", icons: ["Dog", "Cat", "Fish", "Bird", "Rabbit", "PawPrint"] },
-  { category: "Study", icons: ["BookOpen", "Pencil", "GraduationCap", "Brain", "Calculator", "Library"] },
-  { category: "Misc", icons: ["Star", "Heart", "Zap", "Package", "Hammer", "Wrench", "Shirt", "Bed", "Car", "Baby"] }
+  { category: "Cleaning", icons: ["Trash2", "Sparkles", "WashingMachine", "Droplets", "Brush", "Eraser", "Wind", "Recycle"] },
+  { category: "Bathroom", icons: ["Bath", "ShowerHead", "Droplet", "ToiletIcon", "Brush", "Sparkles", "Thermometer"] },
+  { category: "Kitchen", icons: ["UtensilsCrossed", "Coffee", "ShoppingCart", "Apple", "CookingPot", "Refrigerator", "Pizza", "Sandwich", "Soup", "Citrus"] },
+  { category: "Yard", icons: ["Shovel", "Scissors", "Sprout", "Flower2", "TreePine", "Axe", "Leaf", "Trees", "CloudRain", "Tractor", "Sun", "Cloudy"] },
+  { category: "Pets", icons: ["Dog", "Cat", "Fish", "Bird", "Rabbit", "PawPrint", "Bone", "Bug"] },
+  { category: "Study", icons: ["BookOpen", "Pencil", "GraduationCap", "Brain", "Calculator", "Library", "Microscope", "Globe", "FlaskConical", "Ruler"] },
+  { category: "Toys & Play", icons: ["Gamepad2", "Puzzle", "Dices", "Trophy", "Bike", "Music", "Tv", "Volleyball", "Tent", "Backpack", "Guitar", "Palette"] },
+  { category: "Health", icons: ["Smile", "Moon", "Sunrise", "Dumbbell", "Apple", "Heart", "Stethoscope", "Pill", "Timer", "BedDouble"] },
+  { category: "Chores & Home", icons: ["Star", "Zap", "Package", "Hammer", "Wrench", "Shirt", "Bed", "Car", "Baby", "Key", "Lightbulb", "Mailbox", "Sofa", "Lamp", "Archive"] }
 ];
 
 const PRESET_EMOJIS = [
-  { category: "Cleaning", emojis: ["🧹", "🧺", "🧻", "🧽", "🪣", "🫧", "🧴", "🪠"] },
-  { category: "Bathroom", emojis: ["🛁", "🚿", "🪥", "🧼", "🪒", "🪮"] },
-  { category: "Kitchen", emojis: ["🍽️", "🥄", "🍳", "🥗", "☕", "🧁", "🛒", "🍎"] },
-  { category: "Yard", emojis: ["🌱", "🌿", "🌳", "🌸", "🌻", "🪴", "🍂", "🌾"] },
-  { category: "Pets", emojis: ["🐕", "🐈", "🐠", "🐦", "🐇", "🐾", "🦴", "🐿️"] },
-  { category: "Study", emojis: ["📚", "✏️", "📝", "🎓", "🧠", "📖", "🖊️", "📐"] },
-  { category: "Misc", emojis: ["⭐", "❤️", "⚡", "📦", "🔨", "🔧", "👕", "🛏️", "🚗", "👶", "💰", "🎯", "🏆", "🎁"] }
+  { category: "Cleaning", emojis: ["🧹", "🧺", "🧻", "🧽", "🪣", "🫧", "🧴", "🪠", "🫙", "🧯"] },
+  { category: "Bathroom", emojis: ["🛁", "🚿", "🪥", "🧼", "🪒", "🪮", "💊", "🩺"] },
+  { category: "Kitchen", emojis: ["🍽️", "🥄", "🍳", "🥗", "☕", "🧁", "🛒", "🍎", "🥪", "🍕", "🫕", "🥘", "🍱", "🥤"] },
+  { category: "Yard", emojis: ["🌱", "🌿", "🌳", "🌸", "🌻", "🪴", "🍂", "🌾", "🍀", "🪨", "🌵", "🎋", "🪵", "☀️"] },
+  { category: "Pets", emojis: ["🐕", "🐈", "🐠", "🐦", "🐇", "🐾", "🦴", "🐿️", "🐢", "🦎", "🐹", "🦜", "🐓", "🦟"] },
+  { category: "Study", emojis: ["📚", "✏️", "📝", "🎓", "🧠", "📖", "🖊️", "📐", "🔬", "🧪", "🌍", "📏", "🖥️", "📓"] },
+  { category: "Toys & Play", emojis: ["🧸", "🎮", "🕹️", "🎲", "🧩", "🪀", "🪁", "🏆", "🚲", "🛴", "🎨", "🎭", "🎪", "🎠", "🤸", "⚽", "🏀", "🎾", "🏈", "🎯"] },
+  { category: "Music", emojis: ["🎵", "🎶", "🎸", "🎹", "🥁", "🎺", "🎻", "🎤", "🎧", "📻"] },
+  { category: "Health & Body", emojis: ["💪", "🏃", "🧘", "😴", "🦷", "🛌", "🚶", "🤸", "⏰", "🧴"] },
+  { category: "Home & Life", emojis: ["⭐", "❤️", "⚡", "📦", "🔨", "🔧", "👕", "🛏️", "🚗", "👶", "💰", "🎁", "💡", "🔑", "📬", "🪑", "🛋️", "🖼️", "🪞", "🗑️"] }
 ];
 
 const memberSchema = z.object({
