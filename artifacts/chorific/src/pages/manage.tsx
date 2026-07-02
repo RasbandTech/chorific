@@ -41,7 +41,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Users, ClipboardList, Plus, Trash2, Edit2, AlertCircle, Settings2, Heart, PiggyBank, ShoppingBag } from "lucide-react";
+import { Users, ClipboardList, Plus, Trash2, Edit2, AlertCircle, Settings2, Heart, PiggyBank, ShoppingBag, Globe } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -147,12 +147,14 @@ export default function Manage() {
   const [charityPct, setCharityPct] = useState(10);
   const [savingsPct, setSavingsPct] = useState(20);
   const [spendingPct, setSpendingPct] = useState(70);
+  const [timezone, setTimezone] = useState("America/New_York");
 
   useEffect(() => {
     if (settings) {
       setCharityPct(settings.charityPercent);
       setSavingsPct(settings.savingsPercent);
       setSpendingPct(settings.spendingPercent);
+      if (settings.timezone) setTimezone(settings.timezone);
     }
   }, [settings]);
 
@@ -164,11 +166,11 @@ export default function Manage() {
       return;
     }
     updateSettings.mutate(
-      { data: { charityPercent: charityPct, savingsPercent: savingsPct, spendingPercent: spendingPct } },
+      { data: { charityPercent: charityPct, savingsPercent: savingsPct, spendingPercent: spendingPct, timezone } },
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
-          toast({ title: "Spending plan saved!" });
+          toast({ title: "Settings saved!" });
         },
         onError: () => {
           toast({ title: "Failed to save settings", variant: "destructive" });
@@ -494,6 +496,87 @@ export default function Manage() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
+          {/* Timezone */}
+          <div>
+            <h2 className="text-xl font-bold tracking-tight mb-1">Timezone</h2>
+            <p className="text-sm text-muted-foreground">
+              Used to determine when "today" starts and ends for chore resets.
+            </p>
+          </div>
+          <Card className="border-violet-100 bg-violet-50/40">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-violet-100 flex items-center justify-center">
+                  <Globe className="w-4 h-4 text-violet-500" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">Household Timezone</p>
+                  <p className="text-xs text-muted-foreground">All chore schedules use this timezone</p>
+                </div>
+              </div>
+              <select
+                value={timezone}
+                onChange={e => setTimezone(e.target.value)}
+                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <optgroup label="United States">
+                  <option value="America/New_York">Eastern Time (New York)</option>
+                  <option value="America/Chicago">Central Time (Chicago)</option>
+                  <option value="America/Denver">Mountain Time (Denver)</option>
+                  <option value="America/Phoenix">Mountain Time – no DST (Phoenix)</option>
+                  <option value="America/Los_Angeles">Pacific Time (Los Angeles)</option>
+                  <option value="America/Anchorage">Alaska Time (Anchorage)</option>
+                  <option value="Pacific/Honolulu">Hawaii Time (Honolulu)</option>
+                </optgroup>
+                <optgroup label="Canada">
+                  <option value="America/Toronto">Eastern Time (Toronto)</option>
+                  <option value="America/Winnipeg">Central Time (Winnipeg)</option>
+                  <option value="America/Edmonton">Mountain Time (Edmonton)</option>
+                  <option value="America/Vancouver">Pacific Time (Vancouver)</option>
+                  <option value="America/Halifax">Atlantic Time (Halifax)</option>
+                  <option value="America/St_Johns">Newfoundland Time (St. John's)</option>
+                </optgroup>
+                <optgroup label="United Kingdom &amp; Ireland">
+                  <option value="Europe/London">London (GMT/BST)</option>
+                  <option value="Europe/Dublin">Dublin (IST)</option>
+                </optgroup>
+                <optgroup label="Europe">
+                  <option value="Europe/Paris">Central European Time (Paris, Berlin, Rome)</option>
+                  <option value="Europe/Helsinki">Eastern European Time (Helsinki, Athens)</option>
+                  <option value="Europe/Moscow">Moscow Time</option>
+                </optgroup>
+                <optgroup label="Australia &amp; New Zealand">
+                  <option value="Australia/Sydney">Sydney (AEDT/AEST)</option>
+                  <option value="Australia/Melbourne">Melbourne (AEDT/AEST)</option>
+                  <option value="Australia/Brisbane">Brisbane (AEST, no DST)</option>
+                  <option value="Australia/Perth">Perth (AWST)</option>
+                  <option value="Pacific/Auckland">Auckland (NZDT/NZST)</option>
+                </optgroup>
+                <optgroup label="Asia">
+                  <option value="Asia/Tokyo">Japan (Tokyo)</option>
+                  <option value="Asia/Shanghai">China (Shanghai)</option>
+                  <option value="Asia/Kolkata">India (Kolkata, IST)</option>
+                  <option value="Asia/Dubai">Gulf Time (Dubai)</option>
+                  <option value="Asia/Singapore">Singapore</option>
+                  <option value="Asia/Seoul">Korea (Seoul)</option>
+                </optgroup>
+                <optgroup label="Latin America">
+                  <option value="America/Sao_Paulo">São Paulo (BRT)</option>
+                  <option value="America/Argentina/Buenos_Aires">Buenos Aires (ART)</option>
+                  <option value="America/Mexico_City">Mexico City (CST/CDT)</option>
+                </optgroup>
+                <optgroup label="Africa">
+                  <option value="Africa/Johannesburg">South Africa (SAST)</option>
+                  <option value="Africa/Nairobi">East Africa (EAT)</option>
+                  <option value="Africa/Lagos">West Africa (WAT)</option>
+                </optgroup>
+                <optgroup label="UTC">
+                  <option value="UTC">UTC</option>
+                </optgroup>
+              </select>
+            </CardContent>
+          </Card>
+
           <div>
             <h2 className="text-xl font-bold tracking-tight mb-1">Spending Plan</h2>
             <p className="text-sm text-muted-foreground">

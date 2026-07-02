@@ -714,7 +714,7 @@ components:
 
     Settings:
       type: object
-      required: [charityPercent, savingsPercent, spendingPercent]
+      required: [charityPercent, savingsPercent, spendingPercent, timezone]
       properties:
         charityPercent:
           type: integer
@@ -728,6 +728,8 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+        timezone:
+          type: string
 
     SettingsInput:
       type: object
@@ -745,6 +747,8 @@ components:
           type: integer
           minimum: 0
           maximum: 100
+        timezone:
+          type: string
 
     AdhocCompletion:
       type: object

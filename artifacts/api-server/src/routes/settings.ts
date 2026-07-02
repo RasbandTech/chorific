@@ -4,7 +4,12 @@ import { eq } from "drizzle-orm";
 
 const router = Router();
 
-const DEFAULTS = { charityPercent: 10, savingsPercent: 20, spendingPercent: 70 };
+const DEFAULTS = {
+  charityPercent: 10,
+  savingsPercent: 20,
+  spendingPercent: 70,
+  timezone: "America/New_York",
+};
 
 async function getOrCreateSettings() {
   const rows = await db.select().from(settingsTable).where(eq(settingsTable.id, 1));
@@ -20,6 +25,7 @@ router.get("/settings", async (_req, res) => {
       charityPercent: settings.charityPercent,
       savingsPercent: settings.savingsPercent,
       spendingPercent: settings.spendingPercent,
+      timezone: settings.timezone,
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch settings" });
@@ -28,7 +34,7 @@ router.get("/settings", async (_req, res) => {
 
 router.put("/settings", async (req, res) => {
   try {
-    const { charityPercent, savingsPercent, spendingPercent } = req.body;
+    const { charityPercent, savingsPercent, spendingPercent, timezone } = req.body;
     if (
       typeof charityPercent !== "number" ||
       typeof savingsPercent !== "number" ||
@@ -46,7 +52,12 @@ router.put("/settings", async (req, res) => {
     await getOrCreateSettings();
     const [updated] = await db
       .update(settingsTable)
-      .set({ charityPercent, savingsPercent, spendingPercent })
+      .set({
+        charityPercent,
+        savingsPercent,
+        spendingPercent,
+        ...(timezone ? { timezone } : {}),
+      })
       .where(eq(settingsTable.id, 1))
       .returning();
 
@@ -54,6 +65,7 @@ router.put("/settings", async (req, res) => {
       charityPercent: updated.charityPercent,
       savingsPercent: updated.savingsPercent,
       spendingPercent: updated.spendingPercent,
+      timezone: updated.timezone,
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to update settings" });

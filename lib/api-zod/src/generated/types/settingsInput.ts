@@ -22,4 +22,5 @@ export interface SettingsInput {
      * @maximum 100
      */
   spendingPercent: number;
+  timezone?: string;
 }

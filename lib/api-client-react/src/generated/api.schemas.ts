@@ -228,6 +228,7 @@ export interface Settings {
      * @maximum 100
      */
   spendingPercent: number;
+  timezone: string;
 }
 
 export interface SettingsInput {
@@ -246,6 +247,7 @@ export interface SettingsInput {
      * @maximum 100
      */
   spendingPercent: number;
+  timezone?: string;
 }
 
 export interface AdhocCompletion {

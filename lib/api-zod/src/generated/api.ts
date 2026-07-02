@@ -432,7 +432,8 @@ export const getSettingsResponseSpendingPercentMax = 100;
 export const GetSettingsResponse = zod.object({
   "charityPercent": zod.number().min(getSettingsResponseCharityPercentMin).max(getSettingsResponseCharityPercentMax),
   "savingsPercent": zod.number().min(getSettingsResponseSavingsPercentMin).max(getSettingsResponseSavingsPercentMax),
-  "spendingPercent": zod.number().min(getSettingsResponseSpendingPercentMin).max(getSettingsResponseSpendingPercentMax)
+  "spendingPercent": zod.number().min(getSettingsResponseSpendingPercentMin).max(getSettingsResponseSpendingPercentMax),
+  "timezone": zod.string()
 })
 
 
@@ -453,7 +454,8 @@ export const updateSettingsBodySpendingPercentMax = 100;
 export const UpdateSettingsBody = zod.object({
   "charityPercent": zod.number().min(updateSettingsBodyCharityPercentMin).max(updateSettingsBodyCharityPercentMax),
   "savingsPercent": zod.number().min(updateSettingsBodySavingsPercentMin).max(updateSettingsBodySavingsPercentMax),
-  "spendingPercent": zod.number().min(updateSettingsBodySpendingPercentMin).max(updateSettingsBodySpendingPercentMax)
+  "spendingPercent": zod.number().min(updateSettingsBodySpendingPercentMin).max(updateSettingsBodySpendingPercentMax),
+  "timezone": zod.string().optional()
 })
 
 export const updateSettingsResponseCharityPercentMin = 0;
@@ -470,7 +472,8 @@ export const updateSettingsResponseSpendingPercentMax = 100;
 export const UpdateSettingsResponse = zod.object({
   "charityPercent": zod.number().min(updateSettingsResponseCharityPercentMin).max(updateSettingsResponseCharityPercentMax),
   "savingsPercent": zod.number().min(updateSettingsResponseSavingsPercentMin).max(updateSettingsResponseSavingsPercentMax),
-  "spendingPercent": zod.number().min(updateSettingsResponseSpendingPercentMin).max(updateSettingsResponseSpendingPercentMax)
+  "spendingPercent": zod.number().min(updateSettingsResponseSpendingPercentMin).max(updateSettingsResponseSpendingPercentMax),
+  "timezone": zod.string()
 })
 
 
