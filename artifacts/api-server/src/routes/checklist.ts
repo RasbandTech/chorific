@@ -1,14 +1,13 @@
 import { Router } from "express";
-import { db, membersTable, choresTable, assignmentsTable, completionsTable } from "@workspace/db";
+import { db, membersTable, choresTable, assignmentsTable, completionsTable, settingsTable } from "@workspace/db";
 import { eq, and, gte, lt } from "drizzle-orm";
+import { todayRangeInTz, todayDowInTz } from "../utils/timezone";
 
 const router = Router();
 
-function todayRange() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-  return { start, end };
+async function getTimezone(): Promise<string> {
+  const rows = await db.select({ timezone: settingsTable.timezone }).from(settingsTable).where(eq(settingsTable.id, 1));
+  return rows[0]?.timezone ?? "UTC";
 }
 
 function parseScheduledDays(raw: string | null | undefined): number[] | null {
@@ -16,17 +15,19 @@ function parseScheduledDays(raw: string | null | undefined): number[] | null {
   try { return JSON.parse(raw); } catch { return null; }
 }
 
-function choreAppearsToday(chore: typeof choresTable.$inferSelect): boolean {
+function choreAppearsToday(chore: typeof choresTable.$inferSelect, todayDow: number): boolean {
   if (chore.frequency === "daily") return true;
   const scheduledDays = parseScheduledDays(chore.scheduledDays);
   if (!scheduledDays || scheduledDays.length === 0) return true;
-  const todayDow = new Date().getDay();
   return scheduledDays.includes(todayDow);
 }
 
 router.get("/checklist", async (req, res) => {
   try {
-    const { start, end } = todayRange();
+    const timezone = await getTimezone();
+    const { start, end } = todayRangeInTz(timezone);
+    const todayDow = todayDowInTz(timezone);
+
     const members = await db.select().from(membersTable).orderBy(membersTable.createdAt);
     const chores = (await db.select().from(choresTable)).filter(c => c.frequency !== "adhoc");
     const allAssignments = await db.select().from(assignmentsTable);
@@ -36,7 +37,7 @@ router.get("/checklist", async (req, res) => {
     const result = members.map(member => {
       const memberAssignments = allAssignments.filter(a => a.memberId === member.id);
       const assignedChores = chores.filter(c =>
-        memberAssignments.some(a => a.choreId === c.id) && choreAppearsToday(c)
+        memberAssignments.some(a => a.choreId === c.id) && choreAppearsToday(c, todayDow)
       );
 
       const choreItems = assignedChores.map(chore => {

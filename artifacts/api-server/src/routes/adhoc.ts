@@ -1,19 +1,19 @@
 import { Router } from "express";
-import { db, choresTable, completionsTable, assignmentsTable, adhocPendingTable } from "@workspace/db";
+import { db, choresTable, completionsTable, assignmentsTable, adhocPendingTable, settingsTable } from "@workspace/db";
 import { eq, and, gte, lt } from "drizzle-orm";
+import { todayRangeInTz } from "../utils/timezone";
 
 const router = Router();
 
-function todayRange() {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-  return { start, end };
+async function getTimezone(): Promise<string> {
+  const rows = await db.select({ timezone: settingsTable.timezone }).from(settingsTable).where(eq(settingsTable.id, 1));
+  return rows[0]?.timezone ?? "UTC";
 }
 
 router.get("/adhoc", async (_req, res) => {
   try {
-    const { start, end } = todayRange();
+    const timezone = await getTimezone();
+    const { start, end } = todayRangeInTz(timezone);
 
     const adhocChores = await db
       .select()
